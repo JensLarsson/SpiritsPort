@@ -18,6 +18,5 @@ public abstract class BoardState
             EndTurnWindow.Instance.EndTurnPopup();
         }
     }
-
 }
 

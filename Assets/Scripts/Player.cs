@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,8 +10,9 @@ using UnityEngine;
 public class Player : ScriptableObject
 {
     [SerializeField] string playerName;
-    [SerializeField] Color playerColour;
-    [SerializeField] List<BoardUnit> boardUnits = new List<BoardUnit>();
+    [SerializeField] Color playerColour = Color.white;
+    [SerializeField] List<Creature> creatures;
+    List<BoardUnit> boardUnits = new List<BoardUnit>();
 
 
     public void AddUnit(BoardUnit unit)
@@ -30,6 +32,7 @@ public class Player : ScriptableObject
 
 
     public string PlayerName => playerName;
+    public ReadOnlyCollection<Creature> Creatures => creatures.AsReadOnly();
     public List<BoardUnit> BoardUnits => boardUnits;
     public Color PlayerColour => playerColour;
 }

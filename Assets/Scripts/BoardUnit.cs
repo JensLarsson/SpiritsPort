@@ -12,33 +12,35 @@ public class BoardUnit : MonoBehaviour
     [SerializeField] Creature creature;
     [SerializeField] HealthBar healthBar;
     [SerializeField] EffectDisplay effectDisplay;
-    [SerializeField] SpriteRenderer playerMarker;
+    [SerializeField] protected SpriteRenderer playerMarker;
     [SerializeField] GameObject directionArrow;
+    [SerializeField] protected bool pushable = true;
 
     Animator animator;
-    SpriteRenderer spriteRenderer;
-    List<Material> materials;
+    protected SpriteRenderer spriteRenderer;
+    protected List<Material> materials;
     #endregion
 
     #region Unit Variables
     // // Unit variables
     public Player OwningPlayer { get; private set; }
-    public BoardTile OccupiedTile { get; private set; }
+    public BoardTile OccupiedTile => occupiedTile;
+    BoardTile occupiedTile;
     public bool Snared { get; private set; }
     public bool isDead { get; private set; }
     List<OverTimeEffect> overTimeEffects = new List<OverTimeEffect>();
-    public int CurrentHealth
+    public virtual int CurrentHealth
     {
         get => health;
-        private set
+        protected set
         {
             health = value;
             isDead = (health <= 0);
         }
     }
 
-    int health = 3;
-    public int MaxMovement { get; private set; }
+    [SerializeField] protected int health = 3;
+    public int MaxMovement { get; protected set; }
     int moves = 1;
     public void UseAbility()
     {
@@ -54,23 +56,27 @@ public class BoardUnit : MonoBehaviour
         materials = spriteRenderer.materials.ToList();
     }
 
-    public void UnitConstructor(Creature unitCreature, BoardTile targetTile)
+    public virtual void UnitConstructor(Creature unitCreature, Player player = null)
     {
         creature = unitCreature;
         health = unitCreature.MaxHealth;
         MaxMovement = unitCreature.MoveDistance;
+        if (player != null)
+        {
+            OwningPlayer = player;
+            playerMarker.color = player.PlayerColour;
+        }
         //animator.runtimeAnimatorController = unitCreature.AnimationController;
-        Move(targetTile);
     }
 
-    public void Move(BoardTile targetTile, bool useMoveAction = false)
+    public virtual void Move(BoardTile targetTile, bool useMoveAction = false)
     {
         if (OccupiedTile != null)
         {
             OccupiedTile.RemoveUnit(this);
         }
         targetTile.AddUnit(this);
-        OccupiedTile = targetTile;
+        occupiedTile = targetTile;
         transform.position = targetTile.transform.position;
         if (useMoveAction)
         {
@@ -187,6 +193,7 @@ public class BoardUnit : MonoBehaviour
     public bool MayAct => !isDead && (MayMove || mayUseAbility);
     public bool MayMove => (moves > 0) && !Snared;
     public bool mayUseAbility => abilityUses > 0;
+    public bool Pushable => pushable;
 
 }
 

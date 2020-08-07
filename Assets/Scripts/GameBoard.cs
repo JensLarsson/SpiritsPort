@@ -10,13 +10,15 @@ public class GameBoard : MonoBehaviour
     [SerializeField] BoardUnit boardUnitPrefab;
     [SerializeField] BoardTile boardTilePrefab;
     [SerializeField] SpriteRenderer SelectionIcon;
+    [SerializeField] int enviromentalObjects = 3;
+    [SerializeField] List<Creature> envirornment = new List<Creature>();
 
     public BoardTile[,] Board { get; private set; }
 #pragma warning disable CS0108 // Member hides inherited member; missing new keyword
     Camera camera;
 #pragma warning restore CS0108 // Member hides inherited member; missing new keyword
     //public FACTION CurrentPlayer { get; private set; }
-    Player[] players = new Player[2];
+    [SerializeField] Player[] players = new Player[2];
     int currentPlayerIndex = 0;
     public Player CurrentPlayer => players[currentPlayerIndex];
     Vector2Int lastMouseOverTile = new Vector2Int(-1, -1);
@@ -28,21 +30,58 @@ public class GameBoard : MonoBehaviour
     {
         Instance = this;
         camera = Camera.main;
-        players[0] = new Player(Color.red);
-        players[1] = new Player(Color.blue);
         UI_PlayerIcons.Instance.SetPlayers(players[0], players[1]);
         UI_PlayerIcons.Instance.SetActivePlayer(players[0]);
         CreateBoard(boardWidth, boardHeight);
-        PlaceBoardUnits();
         UI_UnitBar.Instance.AddUnits(GetAllUnitsOfFaction(players[0]), GetAllUnitsOfFaction(players[1]));
-        boardStateMachine = new BoardStateMachine(new BoardState_UnSelected(CurrentPlayer));
+        boardStateMachine = new BoardStateMachine(
+            new BoardState_PlaceUnits(players[0], true,
+            new BoardState_PlaceUnits(players[1], false,
+            new BoardState_UnSelected(players[0]))));
 
         //consider moving this to its own class
         SelectionIcon = Instantiate(SelectionIcon);
         SelectionIcon.gameObject.SetActive(false);
         ResizeMesh((int)boardWidth, (int)boardHeight);
+        for (int i = 0; i < enviromentalObjects; i++)
+        {
+            int x = UnityEngine.Random.Range(0, (int)boardWidth - 1);
+            int y = UnityEngine.Random.Range(0, (int)boardHeight - 1);
+            int creature = UnityEngine.Random.Range(0, envirornment.Count - 1);
+            BoardTile tile = GetBoardTile(x, y);
+            CreateBoardUnit(envirornment[creature]).Move(tile);
+        }
+
+
+        boardStateMachine.EnterState(this);
     }
 
+    private void Update()
+    {
+        RaycastHit hit;
+        Vector3 mousePos = new Vector3();
+        Ray ray = camera.ScreenPointToRay(Input.mousePosition);
+
+        if (Physics.Raycast(ray, out hit) &&
+            hit.point.x >= 0 && hit.point.x < boardWidth && hit.point.y >= 0 && hit.point.y < boardHeight)
+        {
+            mousePos = hit.point;
+            Vector2Int boardPos = new Vector2Int((int)mousePos.x, (int)mousePos.y);
+            boardStateMachine.Update(boardPos, this);
+            if (boardPos != lastMouseOverTile)
+            {
+                lastMouseOverTile = boardPos;
+            }
+            if (Input.GetKeyDown(KeyCode.Mouse0))
+            {
+                InteractWithTile(boardPos);
+            }
+        }
+        else
+        {
+            boardStateMachine.Update(new Vector2Int(-1, -1), this);
+        }
+    }
     void ResizeMesh(int width, int height)
     {
         Mesh mesh = GetComponent<MeshFilter>().mesh;
@@ -78,35 +117,8 @@ public class GameBoard : MonoBehaviour
         }
     }
 
-    void PlaceBoardUnits()
-    {
-        
-    }
 
 
-
-    private void Update()
-    {
-        RaycastHit hit;
-        Vector3 mousePos = new Vector3();
-        Ray ray = camera.ScreenPointToRay(Input.mousePosition);
-
-        if (Physics.Raycast(ray, out hit) &&
-            hit.point.x >= 0 && hit.point.x < boardWidth && hit.point.y >= 0 && hit.point.y < boardHeight)
-        {
-            mousePos = hit.point;
-            Vector2Int boardPos = new Vector2Int((int)mousePos.x, (int)mousePos.y);
-            boardStateMachine.Update(boardPos, this);
-            if (boardPos != lastMouseOverTile)
-            {
-                lastMouseOverTile = boardPos;
-            }
-            if (Input.GetKeyDown(KeyCode.Mouse0))
-            {
-                InteractWithTile(boardPos);
-            }
-        }
-    }
     public void InteractWithTile(Vector2Int boardPos)
     {
         boardStateMachine.Interact(this, boardPos);
@@ -134,11 +146,38 @@ public class GameBoard : MonoBehaviour
 
 
 
-    public void MoveUnit(BoardUnit unit, Vector2Int pos, bool useMoveAction = false)
-    {
+    public void MoveUnit(BoardUnit unit, Vector2Int pos, bool useMoveAction = false) =>
         unit.Move(GetBoardTile(pos), useMoveAction);
-    }
 
+
+    /// <summary>
+    /// Attempts to move a unit to target tile, deals damage to both target and target tile if target tile is already occupied
+    /// </summary>
+    /// <param name="casterTile"></param>
+    /// <param name="targetTile"></param>
+    public void PushUnit(BoardTile casterTile, BoardTile targetTile)
+    {
+        if (targetTile.GetUnit != null && targetTile.GetUnit.Pushable)
+        {
+            Vector2Int direction = (targetTile.BoardPosition - casterTile.BoardPosition);
+            direction.Clamp(new Vector2Int(-1, -1), new Vector2Int(1, 1));
+            if (direction.magnitude > 1)
+            {
+                Debug.LogError("Yeah, you need to fix this direction bullshit, buddy");
+            }
+            Vector2Int endPosition = targetTile.BoardPosition + direction;
+            BoardTile endTile = GetBoardTile(endPosition);
+            if (endTile != null && endTile.Occupied())
+            {
+                endTile.Attack(1);
+                targetTile.Attack(1);
+            }
+            else if (endTile != null)
+            {
+                MoveUnit(targetTile.GetUnit, endPosition);
+            }
+        }
+    }
 
     /// <summary>
     /// returns the board tile of the boad[,] array. returns null if pos is outside said array
@@ -216,34 +255,6 @@ public class GameBoard : MonoBehaviour
         return list;
     }
 
-    /// <summary>
-    /// Attempts to move a unit to target tile, deals damage to both target and target tile if target tile is already occupied
-    /// </summary>
-    /// <param name="casterTile"></param>
-    /// <param name="targetTile"></param>
-    public void PushUnit(BoardTile casterTile, BoardTile targetTile)
-    {
-        if (targetTile.GetUnit != null)
-        {
-            Vector2Int direction = (targetTile.BoardPosition - casterTile.BoardPosition);
-            direction.Clamp(new Vector2Int(-1, -1), new Vector2Int(1, 1));
-            if (direction.magnitude > 1)
-            {
-                Debug.LogError("Yeah, you need to fix this direction bullshit, buddy");
-            }
-            Vector2Int endPosition = targetTile.BoardPosition + direction;
-            BoardTile endTile = GetBoardTile(endPosition);
-            if (endTile != null && endTile.Occupied())
-            {
-                endTile.Attack(1);
-                targetTile.Attack(1);
-            }
-            else if (endTile != null)
-            {
-                MoveUnit(targetTile.GetUnit, endPosition);
-            }
-        }
-    }
 
     public bool[,] GetAccessibleTiles()
     {
@@ -266,18 +277,19 @@ public class GameBoard : MonoBehaviour
     }
     public void HideSelectionMarker() => SelectionIcon.gameObject.SetActive(false);
 
-    BoardUnit CreateBoardUnit(Creature creature, Vector2Int position)
+    public BoardUnit CreateBoardUnit(Creature creature, Player player = null)
     {
         BoardUnit unit = Instantiate(boardUnitPrefab);
-        unit.UnitConstructor(creature, GetBoardTile(position));
+        unit.UnitConstructor(creature, player);
         Instantiate(creature.GetModelPrefab, unit.transform);
         return unit;
     }
+    //public EnviromentalObjects CreateEnvirornmentUnit(Creature creature)
+    //{
+    //    EnviromentalObjects unit = Instantiate(boardUnitPrefab);
+    //    unit.UnitConstructor(creature, player);
+    //    Instantiate(creature.GetModelPrefab, unit.transform);
+    //    return unit;
+    //}
 
-    [Serializable]
-    public struct UnitStartWrapper
-    {
-        public Creature creature;
-        public Vector2Int position;
-    }
 }

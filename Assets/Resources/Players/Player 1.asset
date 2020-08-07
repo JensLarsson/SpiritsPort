@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96c49b409b73e1345879da4ea7434560, type: 3}
+  m_Name: Player 1
+  m_EditorClassIdentifier: 
+  playerName: 
+  playerColour: {r: 0, g: 1, b: 0.43849897, a: 1}
+  creatures:
+  - {fileID: 11400000, guid: 983ad798ee001e843a0d79d92d0e982c, type: 2}
+  - {fileID: 11400000, guid: bb4eddc15a2c36147ba9a2b8c8eb0efa, type: 2}
+  - {fileID: 11400000, guid: bb4eddc15a2c36147ba9a2b8c8eb0efa, type: 2}

@@ -20,5 +20,6 @@ class BoardStateMachine
         currentState = state;
         currentState.EnterState(board);
     }
+    public void EnterState(GameBoard board) => currentState.EnterState(board);
 }
 
