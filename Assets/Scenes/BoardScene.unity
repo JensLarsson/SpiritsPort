@@ -4115,6 +4115,8 @@ MonoBehaviour:
   boardWidth: 13
   boardHeight: 8
   boardUnitPrefab: {fileID: 1872410055, guid: 52ac866be75f6704f97bd23af76b56b7, type: 3}
+  enviromentalPrefab: {fileID: 4634781888081631099, guid: b096795d29b05de4793dd73e45d6a509,
+    type: 3}
   boardTilePrefab: {fileID: 8411273512198859605, guid: d514f33ebd016c647a4c22e9eb9eb9aa,
     type: 3}
   SelectionIcon: {fileID: 6395483982974707595, guid: 3b656fa22ea99bd4bb532f82ebb698ec,

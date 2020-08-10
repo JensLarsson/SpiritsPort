@@ -13,7 +13,7 @@ public class BoardTile : MonoBehaviour
     TILE_MODE state = TILE_MODE.Unselected;
     SpriteRenderer outlineRenderer;
     [SerializeField] SpriteRenderer backgroundRenderer;
-    BoardUnit heldUnit;
+    BoardUnitBaseClass heldUnit;
     Vector2Int boardPosition;
     private void Awake()
     {
@@ -21,11 +21,11 @@ public class BoardTile : MonoBehaviour
     }
 
     public void SetBoardPosition(Vector2Int pos) => boardPosition = pos;
-    public void AddUnit(BoardUnit unit)
+    public void AddUnit(BoardUnitBaseClass unit)
     {
         heldUnit = unit;
     }
-    public void RemoveUnit(BoardUnit unit)
+    public void RemoveUnit(BoardUnitBaseClass unit)
     {
         heldUnit = null;
     }
@@ -50,6 +50,6 @@ public class BoardTile : MonoBehaviour
     }
     public Vector2Int BoardPosition => boardPosition;
     public Vector2 Position => transform.position;
-    public BoardUnit GetUnit => heldUnit;
+    public BoardUnitBaseClass GetUnit => heldUnit;
     public TILE_MODE State => state;
 }

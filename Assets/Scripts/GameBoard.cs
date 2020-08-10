@@ -8,6 +8,7 @@ public class GameBoard : MonoBehaviour
     public uint boardWidth = 10, boardHeight = 10;
 
     [SerializeField] BoardUnit boardUnitPrefab;
+    [SerializeField] EnviromentalObject enviromentalPrefab;
     [SerializeField] BoardTile boardTilePrefab;
     [SerializeField] SpriteRenderer SelectionIcon;
     [SerializeField] int enviromentalObjects = 3;
@@ -49,7 +50,7 @@ public class GameBoard : MonoBehaviour
             int y = UnityEngine.Random.Range(0, (int)boardHeight - 1);
             int creature = UnityEngine.Random.Range(0, envirornment.Count - 1);
             BoardTile tile = GetBoardTile(x, y);
-            CreateBoardUnit(envirornment[creature]).Move(tile);
+            CreateBoardUnit<EnviromentalObject>(envirornment[creature]).Move(tile);
         }
 
 
@@ -146,7 +147,7 @@ public class GameBoard : MonoBehaviour
 
 
 
-    public void MoveUnit(BoardUnit unit, Vector2Int pos, bool useMoveAction = false) =>
+    public void MoveUnit(BoardUnitBaseClass unit, Vector2Int pos, bool useMoveAction = false) =>
         unit.Move(GetBoardTile(pos), useMoveAction);
 
 
@@ -210,7 +211,7 @@ public class GameBoard : MonoBehaviour
 
     public void ChangePlayer()
     {
-        foreach (BoardUnit unit in GetAllUnitsOfFaction(CurrentPlayer))
+        foreach (BoardUnitBaseClass unit in GetAllUnitsOfFaction(CurrentPlayer))
         {
             unit.ResetActions();
             unit.OnEndofTurn();
@@ -218,7 +219,7 @@ public class GameBoard : MonoBehaviour
 
         currentPlayerIndex = (currentPlayerIndex + 1) % 2;
         boardStateMachine.ChangeState(new BoardState_UnSelected(CurrentPlayer), this);
-        foreach (BoardUnit unit in GetAllUnitsOfFaction(CurrentPlayer))
+        foreach (BoardUnitBaseClass unit in GetAllUnitsOfFaction(CurrentPlayer))
         {
             unit.OnStartOfTurn();
         }
@@ -241,9 +242,9 @@ public class GameBoard : MonoBehaviour
         return count;
     }
 
-    List<BoardUnit> GetAllUnitsOfFaction(Player playertion)
+    List<BoardUnitBaseClass> GetAllUnitsOfFaction(Player playertion)
     {
-        List<BoardUnit> list = new List<BoardUnit>();
+        List<BoardUnitBaseClass> list = new List<BoardUnitBaseClass>();
         foreach (BoardTile tile in Board)
         {
             if (tile.GetUnit?.OwningPlayer == playertion)
@@ -277,12 +278,26 @@ public class GameBoard : MonoBehaviour
     }
     public void HideSelectionMarker() => SelectionIcon.gameObject.SetActive(false);
 
-    public BoardUnit CreateBoardUnit(Creature creature, Player player = null)
+    public BoardUnitBaseClass CreateBoardUnit<T>(Creature creature, Player player = null) where T : BoardUnitBaseClass
     {
-        BoardUnit unit = Instantiate(boardUnitPrefab);
-        unit.UnitConstructor(creature, player);
-        Instantiate(creature.GetModelPrefab, unit.transform);
-        return unit;
+        if (typeof(T) == typeof(BoardUnit))
+        {
+            BoardUnitBaseClass unit = Instantiate(boardUnitPrefab);
+            unit.UnitConstructor(creature, player);
+            Renderer renderer = Instantiate(creature.GetModelPrefab, unit.transform)
+                .GetComponent<RendererMiddleman>().GetMeshRenderer;
+            unit.SetRenderer(renderer);
+            return unit;
+        }
+        else
+        {
+            BoardUnitBaseClass unit = Instantiate(enviromentalPrefab);
+            unit.UnitConstructor(creature, player);
+            Renderer renderer = Instantiate(creature.GetModelPrefab, unit.transform)
+                .GetComponent<RendererMiddleman>().GetMeshRenderer;
+            unit.SetRenderer(renderer);
+            return unit;
+        }
     }
     //public EnviromentalObjects CreateEnvirornmentUnit(Creature creature)
     //{

@@ -12,7 +12,7 @@ public class BoardState_Selected : BoardState
 
     public override void EnterState(GameBoard gameBoard, (int x, int y)[] positions = null)
     {
-        BoardUnit unit = selectedTile.GetUnit;
+        BoardUnitBaseClass unit = selectedTile.GetUnit;
         if (unit.MayAct)
         {
             if (unit.MayMove)

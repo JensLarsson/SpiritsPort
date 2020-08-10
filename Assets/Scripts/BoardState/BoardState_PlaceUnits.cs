@@ -15,7 +15,7 @@ class BoardState_PlaceUnits : BoardState
     BoardState upcommingState;
     Vector2Int lastBoardPos;
 
-    BoardUnit selectedUnit;
+    BoardUnitBaseClass selectedUnit;
     public BoardState_PlaceUnits(Player player, bool leftSide, BoardState nextState)
     {
         selectedPlayer = player;
@@ -37,7 +37,7 @@ class BoardState_PlaceUnits : BoardState
                 }
             }
         }
-        selectedUnit = gameBoard.CreateBoardUnit(creatures.Pop(), selectedPlayer);
+        selectedUnit = gameBoard.CreateBoardUnit<BoardUnit>(creatures.Pop(), selectedPlayer);
     }
 
     //unit.UnitConstructor(creature, GetBoardTile(position));
@@ -62,7 +62,7 @@ class BoardState_PlaceUnits : BoardState
 
         if (tile?.GetUnit != null && tile?.State == TILE_MODE.MoveAllowed)
         {
-            BoardUnit temp = tile?.GetUnit;
+            BoardUnitBaseClass temp = tile?.GetUnit;
             selectedUnit?.Move(tile);
             selectedUnit = temp;
         }
@@ -72,7 +72,7 @@ class BoardState_PlaceUnits : BoardState
             selectedUnit = null;
             if (creatures.Count > 0)
             {
-                selectedUnit = gameBoard.CreateBoardUnit(creatures.Pop(), selectedPlayer);
+                selectedUnit = gameBoard.CreateBoardUnit<BoardUnit>(creatures.Pop(), selectedPlayer);
             }
         }
     }

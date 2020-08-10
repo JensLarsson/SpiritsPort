@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 [CreateAssetMenu(fileName = "NewCreature", menuName = "Creature")]
 public class Creature : ScriptableObject
@@ -9,9 +10,7 @@ public class Creature : ScriptableObject
     [SerializeField] int maxHealth = 3;
     [SerializeField] int moveDistance = 3;
     [SerializeField] GameObject unitModel;
-    //[SerializeField] Sprite sprite;
     [SerializeField] Sprite icon;
-    // [SerializeField] RuntimeAnimatorController animationController;
 
 
 
@@ -24,8 +23,6 @@ public class Creature : ScriptableObject
     public List<Ability> Abilities => abilities;
     public int MaxHealth => maxHealth;
     public int MoveDistance => moveDistance;
-    // public Sprite GetSprite => sprite;
     public GameObject GetModelPrefab => unitModel;
     public Sprite GetIcon => icon;
-    //public RuntimeAnimatorController AnimationController => animationController;
 }

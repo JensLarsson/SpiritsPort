@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BoardUnit : MonoBehaviour
+public class BoardUnit : BoardUnitBaseClass
 {
     // // Editor Connections
     #region Editor Connections
@@ -12,37 +12,34 @@ public class BoardUnit : MonoBehaviour
     [SerializeField] Creature creature;
     [SerializeField] HealthBar healthBar;
     [SerializeField] EffectDisplay effectDisplay;
-    [SerializeField] protected SpriteRenderer playerMarker;
+    [SerializeField] SpriteRenderer playerMarker;
     [SerializeField] GameObject directionArrow;
-    [SerializeField] protected bool pushable = true;
+    [SerializeField] bool pushable = true;
 
     Animator animator;
-    protected SpriteRenderer spriteRenderer;
-    protected List<Material> materials;
+    List<Material> materials;
+    Renderer renderer;
     #endregion
 
     #region Unit Variables
     // // Unit variables
-    public Player OwningPlayer { get; private set; }
-    public BoardTile OccupiedTile => occupiedTile;
+    Player owningPlayer;
     BoardTile occupiedTile;
-    public bool Snared { get; private set; }
-    public bool isDead { get; private set; }
+    bool snared;
+    bool isDead;
     List<OverTimeEffect> overTimeEffects = new List<OverTimeEffect>();
-    public virtual int CurrentHealth
+    public override int CurrentHealth
     {
         get => health;
-        protected set
+        set
         {
             health = value;
             isDead = (health <= 0);
         }
     }
-
-    [SerializeField] protected int health = 3;
-    public int MaxMovement { get; protected set; }
+    int health = 3;
     int moves = 1;
-    public void UseAbility()
+    public override void UseAbility()
     {
         abilityUses--;
     }
@@ -52,24 +49,20 @@ public class BoardUnit : MonoBehaviour
     private void Awake()
     {
         animator = GetComponent<Animator>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
-        materials = spriteRenderer.materials.ToList();
     }
 
-    public virtual void UnitConstructor(Creature unitCreature, Player player = null)
+    public override void UnitConstructor(Creature unitCreature, Player player = null)
     {
         creature = unitCreature;
         health = unitCreature.MaxHealth;
-        MaxMovement = unitCreature.MoveDistance;
         if (player != null)
         {
-            OwningPlayer = player;
-            playerMarker.color = player.PlayerColour;
+            SetFaction(player);
         }
         //animator.runtimeAnimatorController = unitCreature.AnimationController;
     }
 
-    public virtual void Move(BoardTile targetTile, bool useMoveAction = false)
+    public override void Move(BoardTile targetTile, bool useMoveAction = false)
     {
         if (OccupiedTile != null)
         {
@@ -83,7 +76,7 @@ public class BoardUnit : MonoBehaviour
             moves--;
         }
     }
-    public virtual void DealDamage(int damage)
+    public override void DealDamage(int damage)
     {
         CurrentHealth -= damage;
         ShowHealth(true);
@@ -93,31 +86,31 @@ public class BoardUnit : MonoBehaviour
             healthBar.HideHealth();
         });
     }
-    protected void DamageIndicator(int damage)
+    void DamageIndicator(int damage)
     {
         DamageIndicatorController.Instance.ShowDamage(this.transform, damage);
     }
 
-    public virtual void KillUnit()
+    void KillUnit()
     {
         OccupiedTile.RemoveUnit(this);
         Destroy(this.gameObject);
     }
 
 
-    public void ResetActions()
+    public override void ResetActions()
     {
         abilityUses = 1;
         moves = 1;
     }
-    public void OnStartOfTurn()
+    public override void OnStartOfTurn()
     {
         for (int i = overTimeEffects.Count - 1; i >= 0; i--)
         {
             overTimeEffects[i].OnStartOfturn(this);
         }
     }
-    public void OnEndofTurn()
+    public override void OnEndofTurn()
     {
         for (int i = overTimeEffects.Count - 1; i >= 0; i--)
         {
@@ -127,45 +120,49 @@ public class BoardUnit : MonoBehaviour
                 overTimeEffects.RemoveAt(i);
             }
         }
-        if (isDead)
+        if (IsDead)
         {
             KillUnit();
         }
+    }    public override void SetRenderer(Renderer meshRenderer)
+    {
+        renderer = meshRenderer;
+        materials = renderer.materials.ToList();
     }
-    public void AddTemporaryMaterialEffect(float time, Material material)
+    public override void AddTemporaryMaterialEffect(float time, Material material)
     {
         materials.Add(material);
-        spriteRenderer.materials = materials.ToArray();
+        renderer.materials = materials.ToArray();
         ActionDelayer.RunAfterDelay(time, () =>
          {
              materials.Remove(material);
-             spriteRenderer.materials = materials.ToArray();
+             renderer.materials = materials.ToArray();
          });
     }
 
-    public void AddOverTimeEffect(OverTimeEffect effect)
+    public override void AddOverTimeEffect(OverTimeEffect effect)
     {
         if (overTimeEffects.Contains(effect)) overTimeEffects.Remove(effect);
         overTimeEffects.Add(effect);
     }
 
-    public void ShowHealth(bool forceUpdate = false)
+    public override void ShowHealth(bool forceUpdate = false)
     {
         healthBar.ShowHealth(maxHealth, CurrentHealth, forceUpdate);
     }
 
-    public void SetFaction(Player player)
+    void SetFaction(Player player)
     {
-        this.OwningPlayer = player;
+        owningPlayer = player;
         playerMarker.color = player.PlayerColour;
     }
 
-    public void ShowDirectionArrow(BoardTile from, BoardTile to)
+    public override void ShowDirectionArrow(BoardTile from, BoardTile to)
     {
         directionArrow.SetActive(true);
         directionArrow.transform.right = to.transform.position - from.transform.position;
     }
-    public void HideDirectionArrow()
+    public override void HideDirectionArrow()
     {
         directionArrow.SetActive(false);
     }
@@ -184,16 +181,23 @@ public class BoardUnit : MonoBehaviour
     }
     #endregion
 
+    public override void SetSnared(bool value) => snared = value;
 
-    public void SetSnared(bool value) => Snared = value;
-    public Vector2 Position => OccupiedTile.Position;
-    public List<Ability> abilities => creature.Abilities;
-    public Sprite Icon => creature.GetIcon;
-    public int maxHealth => creature.MaxHealth;
-    public bool MayAct => !isDead && (MayMove || mayUseAbility);
-    public bool MayMove => (moves > 0) && !Snared;
-    public bool mayUseAbility => abilityUses > 0;
-    public bool Pushable => pushable;
+
+
+    public override bool Snared => snared;
+    public override bool IsDead => isDead;
+    public override Player OwningPlayer => owningPlayer;
+    public override BoardTile OccupiedTile => occupiedTile;
+    public override Vector2 Position => OccupiedTile.Position;
+    public override List<Ability> abilities => creature.Abilities;
+    public override Sprite Icon => creature.GetIcon;
+    public override int maxHealth => creature.MaxHealth;
+    public override int MaxMovement => creature.MoveDistance;
+    public override bool MayAct => !IsDead && (MayMove || mayUseAbility);
+    public override bool MayMove => (moves > 0) && !Snared;
+    public override bool mayUseAbility => abilityUses > 0;
+    public override bool Pushable => pushable;
 
 }
 

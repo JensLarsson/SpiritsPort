@@ -25,9 +25,9 @@ public class UI_UnitBar : MonoBehaviour
     }
 
 
-    public void AddUnits(List<BoardUnit> teamA, List<BoardUnit> teamB)
+    public void AddUnits(List<BoardUnitBaseClass> teamA, List<BoardUnitBaseClass> teamB)
     {
-        foreach (BoardUnit unit in teamA)
+        foreach (BoardUnitBaseClass unit in teamA)
         {
             BetterButton button = Instantiate(buttonPrefab, leftList.transform);
             button.SetImage(unit.Icon, false);
@@ -37,7 +37,7 @@ public class UI_UnitBar : MonoBehaviour
             });
             button.SetText("");
         }
-        foreach (BoardUnit unit in teamB)
+        foreach (BoardUnitBaseClass unit in teamB)
         {
             BetterButton button = Instantiate(buttonPrefab, rightList.transform);
             button.SetImage(unit.Icon, false);

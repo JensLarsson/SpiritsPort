@@ -15,7 +15,7 @@ public class OverTimeEffect : ScriptableObject
     {
         TurnsRemaining = TurnsOfEffect;
     }
-    public void OnEndOfTurn(BoardUnit unit)
+    public void OnEndOfTurn(BoardUnitBaseClass unit)
     {
         if (tickParticleEffect != null)
         {
@@ -25,7 +25,7 @@ public class OverTimeEffect : ScriptableObject
         unit.DealDamage(damagePerTrun);
     }
 
-    public void OnStartOfturn(BoardUnit unit)
+    public void OnStartOfturn(BoardUnitBaseClass unit)
     {
         if (snares)
         {

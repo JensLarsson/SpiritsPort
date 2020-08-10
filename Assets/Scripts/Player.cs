@@ -12,14 +12,14 @@ public class Player : ScriptableObject
     [SerializeField] string playerName;
     [SerializeField] Color playerColour = Color.white;
     [SerializeField] List<Creature> creatures;
-    List<BoardUnit> boardUnits = new List<BoardUnit>();
+    List<BoardUnitBaseClass> boardUnits = new List<BoardUnitBaseClass>();
 
 
-    public void AddUnit(BoardUnit unit)
+    public void AddUnit(BoardUnitBaseClass unit)
     {
         boardUnits.Add(unit);
     }
-    public void RemoveUnit(BoardUnit unit)
+    public void RemoveUnit(BoardUnitBaseClass unit)
     {
         boardUnits.Add(unit);
     }
@@ -33,7 +33,7 @@ public class Player : ScriptableObject
 
     public string PlayerName => playerName;
     public ReadOnlyCollection<Creature> Creatures => creatures.AsReadOnly();
-    public List<BoardUnit> BoardUnits => boardUnits;
+    public List<BoardUnitBaseClass> BoardUnits => boardUnits;
     public Color PlayerColour => playerColour;
 }
 
