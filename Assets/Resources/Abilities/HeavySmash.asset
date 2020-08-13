@@ -21,7 +21,7 @@ MonoBehaviour:
   damage: 2
   overTimeEffect: {fileID: 0}
   projectilePrefab: {fileID: 0}
-  onHitParticleEffect: {fileID: 5981594644456424387, guid: 4d2c1674397704447802acbe60ca9582,
+  onHitParticleEffect: {fileID: 7723106049395631158, guid: ff242848a4103a3448caf8fc581bc47b,
     type: 3}
   onHitTargetEffect:
     material: {fileID: 0}

@@ -7,12 +7,10 @@ public class GameBoard : MonoBehaviour
 {
     public uint boardWidth = 10, boardHeight = 10;
 
-    [SerializeField] BoardUnit boardUnitPrefab;
-    [SerializeField] EnviromentalObject enviromentalPrefab;
     [SerializeField] BoardTile boardTilePrefab;
     [SerializeField] SpriteRenderer SelectionIcon;
     [SerializeField] int enviromentalObjects = 3;
-    [SerializeField] List<Creature> envirornment = new List<Creature>();
+    [SerializeField] List<EnviromentalObject> envirornment = new List<EnviromentalObject>();
 
     public BoardTile[,] Board { get; private set; }
 #pragma warning disable CS0108 // Member hides inherited member; missing new keyword
@@ -44,16 +42,17 @@ public class GameBoard : MonoBehaviour
         SelectionIcon = Instantiate(SelectionIcon);
         SelectionIcon.gameObject.SetActive(false);
         ResizeMesh((int)boardWidth, (int)boardHeight);
-        for (int i = 0; i < enviromentalObjects; i++)
+        if (envirornment.Count > 0)
         {
-            int x = UnityEngine.Random.Range(0, (int)boardWidth - 1);
-            int y = UnityEngine.Random.Range(0, (int)boardHeight - 1);
-            int creature = UnityEngine.Random.Range(0, envirornment.Count - 1);
-            BoardTile tile = GetBoardTile(x, y);
-            CreateBoardUnit<EnviromentalObject>(envirornment[creature]).Move(tile);
+            for (int i = 0; i < enviromentalObjects; i++)
+            {
+                int x = UnityEngine.Random.Range(0, (int)boardWidth - 1);
+                int y = UnityEngine.Random.Range(0, (int)boardHeight - 1);
+                int unitIndex = UnityEngine.Random.Range(0, envirornment.Count);
+                BoardTile tile = GetBoardTile(x, y);
+                CreateBoardUnit(envirornment[unitIndex]).Move(tile);
+            }
         }
-
-
         boardStateMachine.EnterState(this);
     }
 
@@ -278,26 +277,18 @@ public class GameBoard : MonoBehaviour
     }
     public void HideSelectionMarker() => SelectionIcon.gameObject.SetActive(false);
 
-    public BoardUnitBaseClass CreateBoardUnit<T>(Creature creature, Player player = null) where T : BoardUnitBaseClass
+    public BoardUnitBaseClass CreateBoardUnit(BoardUnitBaseClass creature, Player player = null) 
     {
-        if (typeof(T) == typeof(BoardUnit))
-        {
-            BoardUnitBaseClass unit = Instantiate(boardUnitPrefab);
-            unit.UnitConstructor(creature, player);
-            Renderer renderer = Instantiate(creature.GetModelPrefab, unit.transform)
-                .GetComponent<RendererMiddleman>().GetMeshRenderer;
-            unit.SetRenderer(renderer);
+            BoardUnitBaseClass unit = Instantiate(creature);
+            unit.SetPlayer(player);
             return unit;
-        }
-        else
-        {
-            BoardUnitBaseClass unit = Instantiate(enviromentalPrefab);
-            unit.UnitConstructor(creature, player);
-            Renderer renderer = Instantiate(creature.GetModelPrefab, unit.transform)
-                .GetComponent<RendererMiddleman>().GetMeshRenderer;
-            unit.SetRenderer(renderer);
-            return unit;
-        }
+    }
+
+    public BoardUnit TESTTEST(BoardUnit creature, Player player)
+    {
+        BoardUnit unit = Instantiate(creature);
+        unit.SetPlayer(player);
+        return unit;
     }
     //public EnviromentalObjects CreateEnvirornmentUnit(Creature creature)
     //{

@@ -25,7 +25,7 @@ public class BoardTile : MonoBehaviour
     {
         heldUnit = unit;
     }
-    public void RemoveUnit(BoardUnitBaseClass unit)
+    public void RemoveUnit()
     {
         heldUnit = null;
     }
@@ -34,13 +34,22 @@ public class BoardTile : MonoBehaviour
         this.state = state;
         backgroundRenderer.color = stateColour[(int)state];
     }
+    public void Attack(AbilityParameters param)
+    {
+        if (heldUnit != null)
+        {
+            heldUnit.DealDamage(param);
+        }
+    }
     public void Attack(int damage)
     {
         if (heldUnit != null)
         {
-            heldUnit.DealDamage(damage);
+            heldUnit.DealDamage(new AbilityParameters { damage = 1 });
         }
     }
+
+
     public bool Occupied()
     {
         if (heldUnit == null) return false;
@@ -50,6 +59,12 @@ public class BoardTile : MonoBehaviour
     }
     public Vector2Int BoardPosition => boardPosition;
     public Vector2 Position => transform.position;
-    public BoardUnitBaseClass GetUnit => heldUnit;
+    public BoardUnitBaseClass GetUnit
+    {
+        get
+        {
+            return heldUnit;
+        }
+    }
     public TILE_MODE State => state;
 }

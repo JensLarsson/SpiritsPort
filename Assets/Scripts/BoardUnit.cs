@@ -6,23 +6,15 @@ using UnityEngine;
 
 public class BoardUnit : BoardUnitBaseClass
 {
-    // // Editor Connections
-    #region Editor Connections
-
-    [SerializeField] Creature creature;
-    [SerializeField] HealthBar healthBar;
-    [SerializeField] EffectDisplay effectDisplay;
-    [SerializeField] SpriteRenderer playerMarker;
-    [SerializeField] GameObject directionArrow;
-    [SerializeField] bool pushable = true;
-
-    Animator animator;
-    List<Material> materials;
-    Renderer renderer;
-    #endregion
-
     #region Unit Variables
     // // Unit variables
+    [SerializeField] int maxHealth;
+    [SerializeField] int maxMovement;
+    [SerializeField] List<Ability> abilities = new List<Ability>();
+    [SerializeField] Sprite icon;
+    [SerializeField] Renderer renderer;
+
+
     Player owningPlayer;
     BoardTile occupiedTile;
     bool snared;
@@ -46,27 +38,42 @@ public class BoardUnit : BoardUnitBaseClass
     int abilityUses = 1;
     #endregion
 
+
+    // // Editor Connections
+    #region Editor Connections
+
+    [SerializeField] HealthBar healthBar;
+    [SerializeField] EffectDisplay effectDisplay;
+    [SerializeField] SpriteRenderer playerMarker;
+    [SerializeField] GameObject directionArrow;
+    [SerializeField] bool pushable = true;
+
+    Animator animator;
+    List<Material> materials;
+    #endregion
+
+
+
     private void Awake()
     {
         animator = GetComponent<Animator>();
+        health = maxHealth;
+        materials = renderer.materials.ToList();
     }
 
-    public override void UnitConstructor(Creature unitCreature, Player player = null)
+    public override void SetPlayer(Player player = null)
     {
-        creature = unitCreature;
-        health = unitCreature.MaxHealth;
         if (player != null)
         {
             SetFaction(player);
         }
-        //animator.runtimeAnimatorController = unitCreature.AnimationController;
     }
 
     public override void Move(BoardTile targetTile, bool useMoveAction = false)
     {
-        if (OccupiedTile != null)
+        if (occupiedTile != null && occupiedTile.GetUnit == this)
         {
-            OccupiedTile.RemoveUnit(this);
+            occupiedTile.RemoveUnit();
         }
         targetTile.AddUnit(this);
         occupiedTile = targetTile;
@@ -76,11 +83,11 @@ public class BoardUnit : BoardUnitBaseClass
             moves--;
         }
     }
-    public override void DealDamage(int damage)
+    public override void DealDamage(AbilityParameters param)
     {
-        CurrentHealth -= damage;
+        CurrentHealth -= param.damage;
         ShowHealth(true);
-        DamageIndicator(damage);
+        DamageIndicator(param.damage);
         ActionDelayer.RunAfterDelay(1, () =>
         {
             healthBar.HideHealth();
@@ -93,7 +100,7 @@ public class BoardUnit : BoardUnitBaseClass
 
     void KillUnit()
     {
-        OccupiedTile.RemoveUnit(this);
+        OccupiedTile.RemoveUnit();
         Destroy(this.gameObject);
     }
 
@@ -124,10 +131,6 @@ public class BoardUnit : BoardUnitBaseClass
         {
             KillUnit();
         }
-    }    public override void SetRenderer(Renderer meshRenderer)
-    {
-        renderer = meshRenderer;
-        materials = renderer.materials.ToList();
     }
     public override void AddTemporaryMaterialEffect(float time, Material material)
     {
@@ -190,10 +193,10 @@ public class BoardUnit : BoardUnitBaseClass
     public override Player OwningPlayer => owningPlayer;
     public override BoardTile OccupiedTile => occupiedTile;
     public override Vector2 Position => OccupiedTile.Position;
-    public override List<Ability> abilities => creature.Abilities;
-    public override Sprite Icon => creature.GetIcon;
-    public override int maxHealth => creature.MaxHealth;
-    public override int MaxMovement => creature.MoveDistance;
+    public override List<Ability> Abilites => abilities;
+    public override Sprite Icon => icon;
+    public override int MaxHealth => maxHealth;
+    public override int MaxMovement => maxMovement;
     public override bool MayAct => !IsDead && (MayMove || mayUseAbility);
     public override bool MayMove => (moves > 0) && !Snared;
     public override bool mayUseAbility => abilityUses > 0;

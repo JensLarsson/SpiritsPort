@@ -40,7 +40,14 @@ public class Ability : ScriptableObject
         casterTile?.GetUnit?.UseAbility();
         onHit += () =>
         {
-            targetTile?.Attack(damage);
+            targetTile?.Attack(
+                new AbilityParameters
+                {
+                    damage = damage,
+                    ability = this,
+                    casterTile = casterTile,
+                    caster = casterTile.GetUnit as BoardUnit
+                });
             if (onHitParticleEffect != null)
             {
                 ParticleEffectFactory.StartEffectOnScene(onHitParticleEffect, targetTile.Position);
@@ -123,4 +130,12 @@ public class Ability : ScriptableObject
         public Material material;
         public float time = 1;
     }
+}
+
+public struct AbilityParameters
+{
+    public int damage;
+    public Ability ability;
+    public BoardTile casterTile;
+    public BoardUnit caster;
 }

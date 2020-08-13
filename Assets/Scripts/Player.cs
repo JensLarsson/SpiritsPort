@@ -11,18 +11,17 @@ public class Player : ScriptableObject
 {
     [SerializeField] string playerName;
     [SerializeField] Color playerColour = Color.white;
-    [SerializeField] List<Creature> creatures;
-    List<BoardUnitBaseClass> boardUnits = new List<BoardUnitBaseClass>();
+    [SerializeField] List<BoardUnit> creatures;
 
 
-    public void AddUnit(BoardUnitBaseClass unit)
-    {
-        boardUnits.Add(unit);
-    }
-    public void RemoveUnit(BoardUnitBaseClass unit)
-    {
-        boardUnits.Add(unit);
-    }
+    //public void AddUnit(BoardUnitBaseClass unit)
+    //{
+    //    boardUnits.Add(unit);
+    //}
+    //public void RemoveUnit(BoardUnitBaseClass unit)
+    //{
+    //    boardUnits.Add(unit);
+    //}
 
     public Player(Color col)
     {
@@ -32,8 +31,7 @@ public class Player : ScriptableObject
 
 
     public string PlayerName => playerName;
-    public ReadOnlyCollection<Creature> Creatures => creatures.AsReadOnly();
-    public List<BoardUnitBaseClass> BoardUnits => boardUnits;
+    public ReadOnlyCollection<BoardUnit> Creatures => creatures.AsReadOnly();
     public Color PlayerColour => playerColour;
 }
 

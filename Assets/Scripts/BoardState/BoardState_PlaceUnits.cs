@@ -11,7 +11,7 @@ class BoardState_PlaceUnits : BoardState
     Player selectedPlayer;
     bool placeOnLeftSide;
     BoardTile previousTile;
-    Stack<Creature> creatures = new Stack<Creature>();
+    Stack<BoardUnit> creatures = new Stack<BoardUnit>();
     BoardState upcommingState;
     Vector2Int lastBoardPos;
 
@@ -20,7 +20,7 @@ class BoardState_PlaceUnits : BoardState
     {
         selectedPlayer = player;
         placeOnLeftSide = leftSide;
-        creatures = new Stack<Creature>(player.Creatures);
+        creatures = new Stack<BoardUnit>(player.Creatures);
         upcommingState = nextState;
     }
     public override void EnterState(GameBoard gameBoard, (int x, int y)[] positions = null)
@@ -37,7 +37,7 @@ class BoardState_PlaceUnits : BoardState
                 }
             }
         }
-        selectedUnit = gameBoard.CreateBoardUnit<BoardUnit>(creatures.Pop(), selectedPlayer);
+        selectedUnit = gameBoard.CreateBoardUnit(creatures.Pop(), selectedPlayer);
     }
 
     //unit.UnitConstructor(creature, GetBoardTile(position));
@@ -54,6 +54,10 @@ class BoardState_PlaceUnits : BoardState
         if (Input.GetButtonDown(KeyBindingLibrary.EndTurn) && creatures.Count < 1)
         {
             gameBoard.ChangeState(upcommingState);
+            if (selectedUnit != null)
+            {
+                selectedUnit.transform.position = selectedUnit.Position;
+            }
         }
     }
     public override void Interact(GameBoard gameBoard, Vector2Int position)
@@ -62,7 +66,7 @@ class BoardState_PlaceUnits : BoardState
 
         if (tile?.GetUnit != null && tile?.State == TILE_MODE.MoveAllowed)
         {
-            BoardUnitBaseClass temp = tile?.GetUnit;
+            BoardUnitBaseClass temp = (BoardUnit)tile?.GetUnit;
             selectedUnit?.Move(tile);
             selectedUnit = temp;
         }
@@ -72,7 +76,7 @@ class BoardState_PlaceUnits : BoardState
             selectedUnit = null;
             if (creatures.Count > 0)
             {
-                selectedUnit = gameBoard.CreateBoardUnit<BoardUnit>(creatures.Pop(), selectedPlayer);
+                selectedUnit = gameBoard.CreateBoardUnit(creatures.Pop(), selectedPlayer);
             }
         }
     }

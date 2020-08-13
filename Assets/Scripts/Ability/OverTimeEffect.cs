@@ -22,7 +22,7 @@ public class OverTimeEffect : ScriptableObject
             ParticleEffectFactory.StartEffectOnScene(tickParticleEffect, unit.Position);
         }
         TurnsRemaining--;
-        unit.DealDamage(damagePerTrun);
+        unit.DealDamage(new AbilityParameters { damage = damagePerTrun });
     }
 
     public void OnStartOfturn(BoardUnitBaseClass unit)

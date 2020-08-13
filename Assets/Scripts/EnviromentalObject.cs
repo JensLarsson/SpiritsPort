@@ -2,26 +2,24 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class EnviromentalObject : BoardUnitBaseClass
 {
-    Creature creature;
-    int currentHealth;
-    Sprite icon;
-    BoardTile occupiedTile;
-    List<Material> materials;
+    [SerializeField] protected Renderer renderer;
+    [SerializeField] protected Sprite icon;
+    [SerializeField] protected List<UnityEvent> onHitEvents = new List<UnityEvent>();
+    protected Queue<UnityEvent> OnHitQueue = new Queue<UnityEvent>();
 
-    Renderer renderer;
+    protected int currentHealth;
+    protected BoardTile occupiedTile;
+    protected List<Material> materials;
 
-    public override void UnitConstructor(Creature unitCreature, Player player = null)
+
+    private void Awake()
     {
-        creature = unitCreature;
-        currentHealth = unitCreature.MaxHealth;
-    }
-    public override void SetRenderer(Renderer meshRenderer)
-    {
-        renderer = meshRenderer;
         materials = renderer.materials.ToList();
+        OnHitQueue = new Queue<UnityEvent>(onHitEvents);
     }
     public override void AddTemporaryMaterialEffect(float time, Material material)
     {
@@ -33,10 +31,22 @@ public class EnviromentalObject : BoardUnitBaseClass
             renderer.materials = materials.ToArray();
         });
     }
-
-    public override void DealDamage(int damage)
+    public void InstantiateObject(GameObject gObject)
     {
-        currentHealth -= damage > 0 ? 1 : 0;
+        Instantiate(gObject, transform.position, this.transform.rotation);
+    }
+    public override void DealDamage(AbilityParameters param)
+    {
+        if (param.damage > 0 && OnHitQueue.Count > 0)
+        {
+            OnHitQueue.Dequeue().Invoke();
+        }
+    }
+
+    public void DestroyUnit()
+    {
+        occupiedTile.RemoveUnit();
+        Destroy(this.gameObject);
     }
 
     public override void Move(BoardTile targetTile, bool useMoveAction = false)
@@ -49,17 +59,10 @@ public class EnviromentalObject : BoardUnitBaseClass
         }
     }
 
-    public override void AddOverTimeEffect(OverTimeEffect effect) { }
-    public override void HideDirectionArrow() { }
-    public override void OnEndofTurn() { }
-    public override void OnStartOfTurn() { }
-    public override void ResetActions() { }
-    public override void SetSnared(bool value) { }
-    public override void ShowDirectionArrow(BoardTile from, BoardTile to) { }
-    public override void ShowHealth(bool forceUpdate = false) { }
-    public override void UseAbility() { }
-
-
+    public void ChangeMaterial(Material material)
+    {
+        renderer.material = material;
+    }
 
     public override Vector2 Position => occupiedTile.Position;
 
@@ -79,11 +82,11 @@ public class EnviromentalObject : BoardUnitBaseClass
 
     public override int MaxMovement => 0;
 
-    public override List<Ability> abilities => throw new System.NotImplementedException();
+    public override List<Ability> Abilites => throw new System.NotImplementedException();
 
     public override Sprite Icon => icon;
 
-    public override int maxHealth => creature.MaxHealth;
+    public override int MaxHealth => 0;
 
     public override bool MayAct => false;
 

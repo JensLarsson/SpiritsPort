@@ -4114,16 +4114,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   boardWidth: 13
   boardHeight: 8
-  boardUnitPrefab: {fileID: 1872410055, guid: 52ac866be75f6704f97bd23af76b56b7, type: 3}
-  enviromentalPrefab: {fileID: 4634781888081631099, guid: b096795d29b05de4793dd73e45d6a509,
-    type: 3}
   boardTilePrefab: {fileID: 8411273512198859605, guid: d514f33ebd016c647a4c22e9eb9eb9aa,
     type: 3}
   SelectionIcon: {fileID: 6395483982974707595, guid: 3b656fa22ea99bd4bb532f82ebb698ec,
     type: 3}
   enviromentalObjects: 3
   envirornment:
-  - {fileID: 11400000, guid: 79fc80dd310c584488fd6d20e381ecb5, type: 2}
+  - {fileID: 545833667324079104, guid: b400fa118727ad64db036c5b961f6d96, type: 3}
   players:
   - {fileID: 11400000, guid: 5523218d1802e544d81224ad2fa02c5a, type: 2}
   - {fileID: 11400000, guid: c4697b93238f32d42a04aae6c7f6bc8c, type: 2}

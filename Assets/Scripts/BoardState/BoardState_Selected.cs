@@ -21,7 +21,7 @@ public class BoardState_Selected : BoardState
             }
             if (unit.mayUseAbility)
             {
-                UI_Abilities.instance.AddAbilities(selectedTile.GetUnit.abilities, selectedTile);
+                UI_Abilities.instance.AddAbilities(selectedTile.GetUnit.Abilites, selectedTile);
             }
         }
         gameBoard.SetSelectionMarker(selectedTile);
