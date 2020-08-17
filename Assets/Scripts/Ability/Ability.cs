@@ -13,6 +13,7 @@ public class Ability : ScriptableObject
     [SerializeField] int maxRange = 20;
     [SerializeField] int damage = 1;
     [SerializeField] OverTimeEffect overTimeEffect;
+    [SerializeField] TileEffect tileEffect;
     [SerializeField] Projectile projectilePrefab;
     [SerializeField] GameObject onHitParticleEffect;
     [SerializeField] OnHitTargetEffect onHitTargetEffect;
@@ -63,6 +64,10 @@ public class Ability : ScriptableObject
             if (onHitTargetEffect.material != null) //Shader shit
             {
                 targetTile?.GetUnit?.AddTemporaryMaterialEffect(onHitTargetEffect.time, onHitTargetEffect.material);
+            }
+            if (tileEffect != null)
+            {
+                targetTile.AddTileEffect(tileEffect);
             }
 
         };

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public enum TILE_MODE { Unselected, Selected, MoveAllowed, AttackAllowed }
@@ -14,12 +15,21 @@ public class BoardTile : MonoBehaviour
     SpriteRenderer outlineRenderer;
     [SerializeField] SpriteRenderer backgroundRenderer;
     BoardUnitBaseClass heldUnit;
+    TileEffect tileEffect;
+
     Vector2Int boardPosition;
     private void Awake()
     {
         outlineRenderer = GetComponent<SpriteRenderer>();
     }
-
+    internal void OnEndOfTurn(Player currentPlayer)
+    {
+        if (heldUnit?.OwningPlayer == currentPlayer)
+        {
+            heldUnit?.AddOverTimeEffect(tileEffect?.GetOverTimeEffect);
+            heldUnit?.OnEndofTurn();
+        }
+    }
     public void SetBoardPosition(Vector2Int pos) => boardPosition = pos;
     public void AddUnit(BoardUnitBaseClass unit)
     {
@@ -41,6 +51,18 @@ public class BoardTile : MonoBehaviour
             heldUnit.DealDamage(param);
         }
     }
+    public void RemoveTileEffect()
+    {
+        tileEffect.Destroy();
+        tileEffect = null;
+    }
+    public void AddTileEffect(TileEffect effect)
+    {
+        TileEffect newEffect = Instantiate(effect, transform.position, Quaternion.identity);
+        tileEffect = effect;
+        heldUnit?.AddOverTimeEffect(newEffect.GetOverTimeEffect);
+    }
+
     public void Attack(int damage)
     {
         if (heldUnit != null)
@@ -67,4 +89,6 @@ public class BoardTile : MonoBehaviour
         }
     }
     public TILE_MODE State => state;
+
+
 }

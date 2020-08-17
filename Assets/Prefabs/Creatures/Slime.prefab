@@ -1194,7 +1194,7 @@ MonoBehaviour:
   maxHealth: 3
   maxMovement: 3
   abilities:
-  - {fileID: 11400000, guid: 2f91d00b137442d4b870e446fec26fb1, type: 2}
+  - {fileID: 11400000, guid: e2becda0b2668ca449d2eb725d8f28fb, type: 2}
   icon: {fileID: 0}
   renderer: {fileID: 4559059981506892965}
   healthBar: {fileID: 7817500283543449989}

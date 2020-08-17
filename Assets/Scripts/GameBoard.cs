@@ -11,6 +11,7 @@ public class GameBoard : MonoBehaviour
     [SerializeField] SpriteRenderer SelectionIcon;
     [SerializeField] int enviromentalObjects = 3;
     [SerializeField] List<EnviromentalObject> envirornment = new List<EnviromentalObject>();
+    [SerializeField] GameObject DustEffect;
 
     public BoardTile[,] Board { get; private set; }
 #pragma warning disable CS0108 // Member hides inherited member; missing new keyword
@@ -22,6 +23,39 @@ public class GameBoard : MonoBehaviour
     public Player CurrentPlayer => players[currentPlayerIndex];
     Vector2Int lastMouseOverTile = new Vector2Int(-1, -1);
     BoardStateMachine boardStateMachine;
+
+
+    Vector2Int[] pushCheckOrder = new Vector2Int[]
+    {
+        new Vector2Int(0,1),
+        new Vector2Int(1,1),
+        new Vector2Int(1,0),
+        new Vector2Int(1,-1),
+        new Vector2Int(0,-1),
+        new Vector2Int(-1,-1),
+        new Vector2Int(-1,0),
+        new Vector2Int(-1,1),
+    };
+
+    BoardTile GetFreeTile(Vector2Int startPos, Vector2Int direction)
+    {
+        int startIndex = 0; //This loop should be replaced with a constant equation
+        for (startIndex = 0; startIndex < pushCheckOrder.Length; startIndex++)
+        {
+            if (pushCheckOrder[startIndex] == direction) break;
+        }
+
+        for (int i = 0; i < pushCheckOrder.Length; i++)
+        {
+            BoardTile tile = GetBoardTile
+                (startPos + pushCheckOrder[(startIndex + i) % pushCheckOrder.Length]);
+            if (!tile.Occupied())
+            {
+                return tile;
+            }
+        }
+        return null;
+    }
 
 
     public static GameBoard Instance;
@@ -155,7 +189,7 @@ public class GameBoard : MonoBehaviour
     /// </summary>
     /// <param name="casterTile"></param>
     /// <param name="targetTile"></param>
-    public void PushUnit(BoardTile casterTile, BoardTile targetTile)
+    public void PushUnit(BoardTile casterTile, BoardTile targetTile, bool forcePush = false)
     {
         if (targetTile.GetUnit != null && targetTile.GetUnit.Pushable)
         {
@@ -167,15 +201,35 @@ public class GameBoard : MonoBehaviour
             }
             Vector2Int endPosition = targetTile.BoardPosition + direction;
             BoardTile endTile = GetBoardTile(endPosition);
-            if (endTile != null && endTile.Occupied())
+            //if target empty
+            if (endTile != null && endTile.Occupied() && !forcePush)
             {
                 endTile.Attack(1);
                 targetTile.Attack(1);
+            }
+            //if target occupied and push is forced
+            else if (
+                (endTile == null || endTile.Occupied())
+                && forcePush)
+            {
+                BoardTile freeTile = GetFreeTile(targetTile.BoardPosition, direction);
+                if (freeTile == null)
+                {
+                    targetTile.Attack(100);
+                }
+                else
+                {
+                    endTile?.Attack(1);
+                    targetTile?.Attack(1);
+                    MoveUnit(targetTile.GetUnit, freeTile.BoardPosition);
+                }
             }
             else if (endTile != null)
             {
                 MoveUnit(targetTile.GetUnit, endPosition);
             }
+            Instantiate(DustEffect, targetTile.Position, Quaternion.identity)
+                .transform.LookAt(casterTile.transform.position);
         }
     }
 
@@ -215,13 +269,13 @@ public class GameBoard : MonoBehaviour
             unit.ResetActions();
             unit.OnEndofTurn();
         }
-
+        foreach (BoardTile tile in Board)
+        {
+            tile.OnEndOfTurn(CurrentPlayer);
+        }
         currentPlayerIndex = (currentPlayerIndex + 1) % 2;
         boardStateMachine.ChangeState(new BoardState_UnSelected(CurrentPlayer), this);
-        foreach (BoardUnitBaseClass unit in GetAllUnitsOfFaction(CurrentPlayer))
-        {
-            unit.OnStartOfTurn();
-        }
+
         UI_PlayerIcons.Instance.SetActivePlayer(CurrentPlayer);
     }
 
@@ -277,11 +331,11 @@ public class GameBoard : MonoBehaviour
     }
     public void HideSelectionMarker() => SelectionIcon.gameObject.SetActive(false);
 
-    public BoardUnitBaseClass CreateBoardUnit(BoardUnitBaseClass creature, Player player = null) 
+    public BoardUnitBaseClass CreateBoardUnit(BoardUnitBaseClass creature, Player player = null)
     {
-            BoardUnitBaseClass unit = Instantiate(creature);
-            unit.SetPlayer(player);
-            return unit;
+        BoardUnitBaseClass unit = Instantiate(creature);
+        unit.SetPlayer(player);
+        return unit;
     }
 
     public BoardUnit TESTTEST(BoardUnit creature, Player player)

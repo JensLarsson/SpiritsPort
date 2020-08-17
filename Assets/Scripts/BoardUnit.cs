@@ -117,6 +117,15 @@ public class BoardUnit : BoardUnitBaseClass
             overTimeEffects[i].OnStartOfturn(this);
         }
     }
+
+    public override void AddOverTimeEffect(OverTimeEffect effect)
+    {
+        if (effect != null)
+        {
+            if (overTimeEffects.Contains(effect)) overTimeEffects.Remove(effect);
+            overTimeEffects.Add(effect);
+        }
+    }
     public override void OnEndofTurn()
     {
         for (int i = overTimeEffects.Count - 1; i >= 0; i--)
@@ -141,12 +150,6 @@ public class BoardUnit : BoardUnitBaseClass
              materials.Remove(material);
              renderer.materials = materials.ToArray();
          });
-    }
-
-    public override void AddOverTimeEffect(OverTimeEffect effect)
-    {
-        if (overTimeEffects.Contains(effect)) overTimeEffects.Remove(effect);
-        overTimeEffects.Add(effect);
     }
 
     public override void ShowHealth(bool forceUpdate = false)

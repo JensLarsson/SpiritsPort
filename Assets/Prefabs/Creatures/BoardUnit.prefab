@@ -258,7 +258,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7713942090566373832}
   m_Layer: 0
-  m_Name: ArrowAxis
+  m_Name: ActionIconAxis
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

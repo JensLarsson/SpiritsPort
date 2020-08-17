@@ -15,7 +15,6 @@ public class Tree : EnviromentalObject
             standing = false;
             Vector2Int fallDirection = occupiedTile.BoardPosition - param.casterTile.BoardPosition;
             fallDirection.Clamp(new Vector2Int(-1, -1), new Vector2Int(1, 1));
-            Debug.Log(fallDirection);
             StartCoroutine(FallAnimation(fallDirection));
         }
     }
@@ -40,7 +39,7 @@ public class Tree : EnviromentalObject
             yield return null;
         }
         BoardTile tile = GameBoard.Instance.GetBoardTile(occupiedTile.BoardPosition + direction);
-        GameBoard.Instance.PushUnit(occupiedTile, tile);
+        GameBoard.Instance.PushUnit(occupiedTile, tile, true);
         tile.AddUnit(this);
         GameBoard.Instance.ChangeState(
             new BoardState_UnSelected(GameBoard.Instance.CurrentPlayer));
