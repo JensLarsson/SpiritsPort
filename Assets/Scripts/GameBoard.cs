@@ -59,14 +59,13 @@ public class GameBoard : MonoBehaviour
 
 
     public static GameBoard Instance;
-    private void Awake()
+    private void Start()
     {
         Instance = this;
         camera = Camera.main;
         UI_PlayerIcons.Instance.SetPlayers(players[0], players[1]);
         UI_PlayerIcons.Instance.SetActivePlayer(players[0]);
         CreateBoard(boardWidth, boardHeight);
-        UI_UnitBar.Instance.AddUnits(GetAllUnitsOfFaction(players[0]), GetAllUnitsOfFaction(players[1]));
         boardStateMachine = new BoardStateMachine(
             new BoardState_PlaceUnits(players[0], true,
             new BoardState_PlaceUnits(players[1], false,
@@ -267,14 +266,13 @@ public class GameBoard : MonoBehaviour
         foreach (BoardUnitBaseClass unit in GetAllUnitsOfFaction(CurrentPlayer))
         {
             unit.ResetActions();
-            unit.OnEndofTurn();
         }
         foreach (BoardTile tile in Board)
         {
             tile.OnEndOfTurn(CurrentPlayer);
         }
         currentPlayerIndex = (currentPlayerIndex + 1) % 2;
-        boardStateMachine.ChangeState(new BoardState_UnSelected(CurrentPlayer), this);
+        boardStateMachine.ChangeState(CurrentPlayer.ControllState, this);
 
         UI_PlayerIcons.Instance.SetActivePlayer(CurrentPlayer);
     }
@@ -295,12 +293,12 @@ public class GameBoard : MonoBehaviour
         return count;
     }
 
-    List<BoardUnitBaseClass> GetAllUnitsOfFaction(Player playertion)
+    public List<BoardUnitBaseClass> GetAllUnitsOfFaction(Player player)
     {
         List<BoardUnitBaseClass> list = new List<BoardUnitBaseClass>();
         foreach (BoardTile tile in Board)
         {
-            if (tile.GetUnit?.OwningPlayer == playertion)
+            if (tile.GetUnit?.OwningPlayer == player)
             {
                 list.Add(tile.GetUnit);
             }
@@ -344,12 +342,4 @@ public class GameBoard : MonoBehaviour
         unit.SetPlayer(player);
         return unit;
     }
-    //public EnviromentalObjects CreateEnvirornmentUnit(Creature creature)
-    //{
-    //    EnviromentalObjects unit = Instantiate(boardUnitPrefab);
-    //    unit.UnitConstructor(creature, player);
-    //    Instantiate(creature.GetModelPrefab, unit.transform);
-    //    return unit;
-    //}
-
 }

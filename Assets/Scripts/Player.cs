@@ -12,7 +12,7 @@ public class Player : ScriptableObject
     [SerializeField] string playerName;
     [SerializeField] Color playerColour = Color.white;
     [SerializeField] List<BoardUnit> creatures;
-
+    [SerializeField] bool isComputer = false;
 
     //public void AddUnit(BoardUnitBaseClass unit)
     //{
@@ -23,15 +23,12 @@ public class Player : ScriptableObject
     //    boardUnits.Add(unit);
     //}
 
-    public Player(Color col)
-    {
-        playerColour = col;
-    }
-
 
 
     public string PlayerName => playerName;
     public ReadOnlyCollection<BoardUnit> Creatures => creatures.AsReadOnly();
     public Color PlayerColour => playerColour;
+    public BoardState ControllState => isComputer ? new BoardState_ComputerControlled(this) : new BoardState_UnSelected(this) as BoardState;
+
 }
 

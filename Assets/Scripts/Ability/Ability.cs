@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "New Ability", menuName = "Ability/Ability")]
@@ -71,9 +72,13 @@ public class Ability : ScriptableObject
             }
 
         };
-        if (projectilePrefab != null) //Move onHit to when projectile reaches target
+        if (projectilePrefab != null && !movesThroughOccupied) //Move onHit to when projectile reaches target
         {
-            Instantiate(projectilePrefab).InitiateProjectile(casterTile.Position, targetTile.Position, onHit);
+            Instantiate(projectilePrefab).LinearTravel(casterTile.Position, targetTile.Position, onHit);
+        }
+        else if (projectilePrefab != null && movesThroughOccupied)
+        {
+            Instantiate(projectilePrefab).ArchTravel(casterTile.Position, targetTile.Position, onHit);
         }
         else        //Instantly activate onHit
         {
@@ -81,12 +86,13 @@ public class Ability : ScriptableObject
         }
     }
 
-    void LinearTargeting(GameBoard board, Vector2Int startPos, bool movesThrough = false)
+    public List<BoardTile> GetLinearTiles(GameBoard board, Vector2Int startPos, bool movesThrough = false)
     {
+        List<BoardTile> tiles = new List<BoardTile>();
         for (int x = startPos.x - minRange; x >= 0; x--)
         {
             BoardTile tile = board.GetBoardTile(x, startPos.y);
-            tile.SetState(TILE_MODE.AttackAllowed);
+            tiles.Add(tile);
             if (!movesThrough && tile.Occupied()
                 || x <= startPos.x - maxRange)
             {
@@ -96,7 +102,7 @@ public class Ability : ScriptableObject
         for (int x = startPos.x + minRange; x < board.boardWidth; x++)
         {
             BoardTile tile = board.GetBoardTile(x, startPos.y);
-            tile.SetState(TILE_MODE.AttackAllowed);
+            tiles.Add(tile);
             if (!movesThrough && tile.Occupied()
                 || x >= startPos.x + maxRange)
             {
@@ -106,7 +112,7 @@ public class Ability : ScriptableObject
         for (int y = startPos.y - minRange; y >= 0; y--)
         {
             BoardTile tile = board.GetBoardTile(startPos.x, y);
-            tile.SetState(TILE_MODE.AttackAllowed);
+            tiles.Add(tile);
             if (!movesThrough && tile.Occupied()
                 || y <= startPos.y - maxRange)
             {
@@ -116,18 +122,29 @@ public class Ability : ScriptableObject
         for (int y = startPos.y + minRange; y < board.boardHeight; y++)
         {
             BoardTile tile = board.GetBoardTile(startPos.x, y);
-            tile.SetState(TILE_MODE.AttackAllowed);
+            tiles.Add(tile);
             if (!movesThrough && tile.Occupied()
                 || y >= startPos.y + maxRange)
             {
                 break;
             }
         }
+        return tiles;
+    }
+
+    public void LinearTargeting(GameBoard board, Vector2Int startPos, bool movesThrough = false)
+    {
+        List<BoardTile> tiles = GetLinearTiles(board, startPos, movesThrough);
+        foreach (BoardTile tile in tiles)
+        {
+            tile.SetState(TILE_MODE.AttackAllowed);
+        }
     }
 
 
     public Sprite Icon => icon;
     public bool PushesTarget => pushesTarget;
+    public bool movesThroughUnits => movesThroughOccupied;
 
     [Serializable]
     class OnHitTargetEffect

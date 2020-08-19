@@ -22,7 +22,8 @@ MonoBehaviour:
   overTimeEffect: {fileID: 0}
   tileEffect: {fileID: 7806085551409302992, guid: dc3e2a9ae9c90cd42b48175582f344c5,
     type: 3}
-  projectilePrefab: {fileID: 0}
+  projectilePrefab: {fileID: -4542606838566509402, guid: f5a5951ba3970c94d92b8399067a7391,
+    type: 3}
   onHitParticleEffect: {fileID: 0}
   onHitTargetEffect:
     material: {fileID: 0}

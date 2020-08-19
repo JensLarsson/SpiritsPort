@@ -15,11 +15,10 @@ public class TileEffect : MonoBehaviour
     {
         model.transform.Rotate(new Vector3(0, 0, Random.Range(0, 360)));
     }
-    public void OnEndOfTurn(BoardUnit unit)
-    {
-        unit.DealDamage(new AbilityParameters { damage = endOfTurnDamage });
-        unit.AddOverTimeEffect(overTimeEffect);
-    }
+    //public void OnEndOfTurn(BoardUnit unit)
+    //{
+    //    unit.DealDamage(new AbilityParameters { damage = endOfTurnDamage });
+    //}
 
     public void SetOccupiedTile(BoardTile tile)
     {
@@ -31,5 +30,5 @@ public class TileEffect : MonoBehaviour
         Destroy(this.gameObject);
     }
 
-    public OverTimeEffect GetOverTimeEffect => overTimeEffect;
+    public OverTimeEffect GetOverTimeEffect => Instantiate(overTimeEffect);
 }

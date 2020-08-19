@@ -49,6 +49,8 @@ public class EnviromentalObject : BoardUnitBaseClass
         Destroy(this.gameObject);
     }
 
+    public void FreeOccupiedTile() => occupiedTile.RemoveUnit();
+
     public override void Move(BoardTile targetTile, bool useMoveAction = false)
     {
         if (occupiedTile == null)

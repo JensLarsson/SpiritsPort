@@ -23,7 +23,16 @@ public class UI_UnitBar : MonoBehaviour
             Destroy(this.gameObject);
         }
     }
-
+    public void AddUnit(BoardUnit unit, bool left)
+    {
+        BetterButton button = Instantiate(buttonPrefab, left ? leftList.transform : rightList.transform);
+        button.SetImage(unit.Icon, false);
+        button.AddAction(() =>
+        {
+            GameBoard.Instance.InteractWithTile(unit.OccupiedTile.BoardPosition);
+        });
+        button.SetText("");
+    }
 
     public void AddUnits(List<BoardUnitBaseClass> teamA, List<BoardUnitBaseClass> teamB)
     {

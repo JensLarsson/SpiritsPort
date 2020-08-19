@@ -38,6 +38,7 @@ class BoardState_PlaceUnits : BoardState
             }
         }
         selectedUnit = gameBoard.CreateBoardUnit(creatures.Pop(), selectedPlayer);
+        UI_UnitBar.Instance.AddUnit(selectedUnit as BoardUnit, placeOnLeftSide);
     }
 
     //unit.UnitConstructor(creature, GetBoardTile(position));
@@ -77,9 +78,11 @@ class BoardState_PlaceUnits : BoardState
             if (creatures.Count > 0)
             {
                 selectedUnit = gameBoard.CreateBoardUnit(creatures.Pop(), selectedPlayer);
+                UI_UnitBar.Instance.AddUnit(selectedUnit as BoardUnit, placeOnLeftSide);
             }
         }
     }
+
     public override void LeaveState(GameBoard gameBoard)
     {
         foreach (BoardTile tile in gameBoard.Board)

@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class EffectDisplay : MonoBehaviour
 {
+    [SerializeField] Image imagePrefab;
 
     /// <summary>
     /// Instantiates icons for the active effects
@@ -14,8 +15,7 @@ public class EffectDisplay : MonoBehaviour
     {
         foreach (OverTimeEffect effect in effects)
         {
-            Image image = new GameObject().AddComponent<Image>();
-            image.transform.parent = this.transform;
+            Image image = Instantiate(imagePrefab, this.transform);
             image.sprite = effect.Icon;
         }
     }

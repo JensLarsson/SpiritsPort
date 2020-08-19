@@ -26,7 +26,11 @@ public class BoardUnit : BoardUnitBaseClass
         set
         {
             health = value;
-            isDead = (health <= 0);
+            if (health <= 0)
+            {
+                KillUnit();
+            }
+            //isDead = (health <= 0);
         }
     }
     int health = 3;
@@ -117,15 +121,6 @@ public class BoardUnit : BoardUnitBaseClass
             overTimeEffects[i].OnStartOfturn(this);
         }
     }
-
-    public override void AddOverTimeEffect(OverTimeEffect effect)
-    {
-        if (effect != null)
-        {
-            if (overTimeEffects.Contains(effect)) overTimeEffects.Remove(effect);
-            overTimeEffects.Add(effect);
-        }
-    }
     public override void OnEndofTurn()
     {
         for (int i = overTimeEffects.Count - 1; i >= 0; i--)
@@ -141,6 +136,22 @@ public class BoardUnit : BoardUnitBaseClass
             KillUnit();
         }
     }
+    public override void AddOverTimeEffect(OverTimeEffect effect)
+    {
+        if (effect != null)
+        {
+            for (int i = 0; i < overTimeEffects.Count; i++)
+            {
+                if (overTimeEffects[i].name == effect.name)
+                {
+                    overTimeEffects.RemoveAt(i);
+                    break;
+                }
+            }
+            overTimeEffects.Add(effect);
+        }
+    }
+
     public override void AddTemporaryMaterialEffect(float time, Material material)
     {
         materials.Add(material);

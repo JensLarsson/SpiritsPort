@@ -1293,6 +1293,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2db64309292f79f4fa56d370610a6f39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  imagePrefab: {fileID: 7433874950238322490, guid: 81d5b4caef0a320479a7154add23d6c5,
+    type: 3}
 --- !u!1 &6431331737614425811
 GameObject:
   m_ObjectHideFlags: 0
@@ -1417,7 +1419,7 @@ MonoBehaviour:
   maxMovement: 3
   abilities:
   - {fileID: 11400000, guid: e6665f74c023f29478fb65738f1d9835, type: 2}
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 45f5193d50642fc44babd8e2be47e04f, type: 3}
   renderer: {fileID: 2908257033473842130}
   healthBar: {fileID: 7817500283543449989}
   effectDisplay: {fileID: 3778084524111959532}

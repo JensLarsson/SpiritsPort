@@ -1,9 +1,11 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "New OverTimeEffect", menuName = "Ability/OverTimeEffect")]
 public class OverTimeEffect : ScriptableObject
+
 {
     [SerializeField] Sprite icon;
     [SerializeField] int TurnsOfEffect = 1;
@@ -33,7 +35,10 @@ public class OverTimeEffect : ScriptableObject
         }
     }
 
-
+    public override int GetHashCode()
+    {
+        return name.GetHashCode();
+    }
 
     public Sprite Icon => icon;
     public int TurnsRemaining { get; private set; }

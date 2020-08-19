@@ -51,6 +51,14 @@ public class BoardTile : MonoBehaviour
             heldUnit.DealDamage(param);
         }
     }
+    public void Attack(int damage)
+    {
+        if (heldUnit != null)
+        {
+            heldUnit.DealDamage(new AbilityParameters { damage = 1 });
+        }
+    }
+
     public void RemoveTileEffect()
     {
         tileEffect.Destroy();
@@ -63,13 +71,7 @@ public class BoardTile : MonoBehaviour
         heldUnit?.AddOverTimeEffect(newEffect.GetOverTimeEffect);
     }
 
-    public void Attack(int damage)
-    {
-        if (heldUnit != null)
-        {
-            heldUnit.DealDamage(new AbilityParameters { damage = 1 });
-        }
-    }
+
 
 
     public bool Occupied()
