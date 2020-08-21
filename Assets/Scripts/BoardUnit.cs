@@ -6,13 +6,17 @@ using UnityEngine;
 
 public class BoardUnit : BoardUnitBaseClass
 {
+    const string DAMAGE_TAKEN = "Damage";
+    const string DEAD = "Death";
+
+
     #region Unit Variables
     // // Unit variables
     [SerializeField] int maxHealth;
     [SerializeField] int maxMovement;
     [SerializeField] List<Ability> abilities = new List<Ability>();
     [SerializeField] Sprite icon;
-    [SerializeField] Renderer renderer;
+    [SerializeField] bool pushable = true;
 
 
     Player owningPlayer;
@@ -50,9 +54,9 @@ public class BoardUnit : BoardUnitBaseClass
     [SerializeField] EffectDisplay effectDisplay;
     [SerializeField] SpriteRenderer playerMarker;
     [SerializeField] GameObject directionArrow;
-    [SerializeField] bool pushable = true;
+    [SerializeField] Renderer renderer;
+    [SerializeField] Animator animator;
 
-    Animator animator;
     List<Material> materials;
     #endregion
 
@@ -60,7 +64,6 @@ public class BoardUnit : BoardUnitBaseClass
 
     private void Awake()
     {
-        animator = GetComponent<Animator>();
         health = maxHealth;
         materials = renderer.materials.ToList();
     }
@@ -89,6 +92,7 @@ public class BoardUnit : BoardUnitBaseClass
     }
     public override void DealDamage(AbilityParameters param)
     {
+        animator?.Play(DAMAGE_TAKEN);
         CurrentHealth -= param.damage;
         ShowHealth(true);
         DamageIndicator(param.damage);
@@ -104,8 +108,16 @@ public class BoardUnit : BoardUnitBaseClass
 
     void KillUnit()
     {
+        isDead = true;
         OccupiedTile.RemoveUnit();
-        Destroy(this.gameObject);
+        UI_UnitBar.Instance.DestroyIcon(this);
+        animator.Play(DEAD);
+        ActionDelayer.RunAfterDelay(animator.GetCurrentAnimatorStateInfo(0).length,
+            () =>
+            {
+                Destroy(this.gameObject);
+            });
+        ;
     }
 
 

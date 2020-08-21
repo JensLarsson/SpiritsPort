@@ -9,6 +9,7 @@ public class UI_UnitBar : MonoBehaviour
     [SerializeField] GridLayoutGroup leftList;
     [SerializeField] GridLayoutGroup rightList;
 
+    Dictionary<BoardUnit, BetterButton> buttons = new Dictionary<BoardUnit, BetterButton>();
 
     public static UI_UnitBar Instance;
 
@@ -26,6 +27,7 @@ public class UI_UnitBar : MonoBehaviour
     public void AddUnit(BoardUnit unit, bool left)
     {
         BetterButton button = Instantiate(buttonPrefab, left ? leftList.transform : rightList.transform);
+        buttons.Add(unit, button);
         button.SetImage(unit.Icon, false);
         button.AddAction(() =>
         {
@@ -33,28 +35,11 @@ public class UI_UnitBar : MonoBehaviour
         });
         button.SetText("");
     }
-
-    public void AddUnits(List<BoardUnitBaseClass> teamA, List<BoardUnitBaseClass> teamB)
+    public void DestroyIcon(BoardUnit unit)
     {
-        foreach (BoardUnitBaseClass unit in teamA)
+        if (buttons.TryGetValue(unit, out var button))
         {
-            BetterButton button = Instantiate(buttonPrefab, leftList.transform);
-            button.SetImage(unit.Icon, false);
-            button.AddAction(() =>
-            {
-                GameBoard.Instance.InteractWithTile(unit.OccupiedTile.BoardPosition);
-            });
-            button.SetText("");
-        }
-        foreach (BoardUnitBaseClass unit in teamB)
-        {
-            BetterButton button = Instantiate(buttonPrefab, rightList.transform);
-            button.SetImage(unit.Icon, false);
-            button.AddAction(() =>
-            {
-                GameBoard.Instance.InteractWithTile(unit.OccupiedTile.BoardPosition);
-            });
-            button.SetText("");
+            Destroy(button.gameObject);
         }
     }
 }

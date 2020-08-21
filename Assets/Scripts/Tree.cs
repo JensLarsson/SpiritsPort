@@ -8,12 +8,15 @@ public class Tree : EnviromentalObject
     [SerializeField] float animationLength = 1;
     [SerializeField] GameObject treeAxis;
     bool standing = true;
+
+    public override bool Targetable => standing;
     public override void DealDamage(AbilityParameters param)
     {
         if (param.damage > 0 && standing)
         {
             standing = false;
-            Vector2Int fallDirection = occupiedTile.BoardPosition - param.casterTile.BoardPosition;
+            //This is pretty fucked...
+            Vector2Int fallDirection = param.direction == Vector2Int.zero ? occupiedTile.BoardPosition - param.casterTile.BoardPosition : param.direction;
             fallDirection.Clamp(new Vector2Int(-1, -1), new Vector2Int(1, 1));
             StartCoroutine(FallAnimation(fallDirection));
         }

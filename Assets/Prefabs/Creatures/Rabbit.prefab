@@ -540,7 +540,7 @@ Animator:
   m_GameObject: {fileID: 3006435416852591386}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: 05b0336cad2ece64b99ce054ed619f4c, type: 3}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 7ada2ebc27dde1a40819a4f41d902c4a, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
   m_ApplyRootMotion: 1
@@ -1305,7 +1305,6 @@ GameObject:
   m_Component:
   - component: {fileID: 6431331737614425820}
   - component: {fileID: 6431331737614425821}
-  - component: {fileID: 6431331737614425810}
   - component: {fileID: 1872410055}
   - component: {fileID: 1335888008641126691}
   m_Layer: 0
@@ -1384,25 +1383,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!95 &6431331737614425810
-Animator:
-  serializedVersion: 3
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6431331737614425811}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!114 &1872410055
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1418,14 +1398,15 @@ MonoBehaviour:
   maxHealth: 3
   maxMovement: 3
   abilities:
-  - {fileID: 11400000, guid: e6665f74c023f29478fb65738f1d9835, type: 2}
+  - {fileID: 11400000, guid: 2f91d00b137442d4b870e446fec26fb1, type: 2}
   icon: {fileID: 21300000, guid: 45f5193d50642fc44babd8e2be47e04f, type: 3}
-  renderer: {fileID: 2908257033473842130}
+  pushable: 1
   healthBar: {fileID: 7817500283543449989}
   effectDisplay: {fileID: 3778084524111959532}
   playerMarker: {fileID: 2095055476447646866}
   directionArrow: {fileID: 3524507376945859682}
-  pushable: 1
+  renderer: {fileID: 2908257033473842130}
+  animator: {fileID: 2948466416327470920}
 --- !u!61 &1335888008641126691
 BoxCollider2D:
   m_ObjectHideFlags: 0

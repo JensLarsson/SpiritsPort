@@ -2168,7 +2168,6 @@ GameObject:
   m_Component:
   - component: {fileID: 6431331737614425820}
   - component: {fileID: 6431331737614425821}
-  - component: {fileID: 6431331737614425810}
   - component: {fileID: 1872410055}
   - component: {fileID: 1335888008641126691}
   m_Layer: 0
@@ -2247,25 +2246,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!95 &6431331737614425810
-Animator:
-  serializedVersion: 3
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6431331737614425811}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!114 &1872410055
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2283,12 +2263,13 @@ MonoBehaviour:
   abilities:
   - {fileID: 11400000, guid: cf2d7e13b37eec64ca61a11d032401a1, type: 2}
   icon: {fileID: 21300000, guid: 5c9895cf39422834286b1c3397406646, type: 3}
-  renderer: {fileID: 1613809056533029752}
+  pushable: 1
   healthBar: {fileID: 7817500283543449989}
   effectDisplay: {fileID: 3778084524111959532}
   playerMarker: {fileID: 2095055476447646866}
   directionArrow: {fileID: 3524507376945859682}
-  pushable: 1
+  renderer: {fileID: 1613809056533029752}
+  animator: {fileID: 1613809056528858908}
 --- !u!61 &1335888008641126691
 BoxCollider2D:
   m_ObjectHideFlags: 0

@@ -29,6 +29,5 @@ public class Player : ScriptableObject
     public ReadOnlyCollection<BoardUnit> Creatures => creatures.AsReadOnly();
     public Color PlayerColour => playerColour;
     public BoardState ControllState => isComputer ? new BoardState_ComputerControlled(this) : new BoardState_UnSelected(this) as BoardState;
-
 }
 

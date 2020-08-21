@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameBoard : MonoBehaviour
 {
@@ -68,7 +69,7 @@ public class GameBoard : MonoBehaviour
         CreateBoard(boardWidth, boardHeight);
         boardStateMachine = new BoardStateMachine(
             new BoardState_PlaceUnits(players[0], true,
-            new BoardState_PlaceUnits(players[1], false,
+            new BoardState_ComputerPlaceUnits(players[1], false,
             new BoardState_UnSelected(players[0]))));
 
         //consider moving this to its own class
@@ -79,8 +80,14 @@ public class GameBoard : MonoBehaviour
         {
             for (int i = 0; i < enviromentalObjects; i++)
             {
-                int x = UnityEngine.Random.Range(0, (int)boardWidth - 1);
-                int y = UnityEngine.Random.Range(0, (int)boardHeight - 1);
+                int x;
+                int y;
+                do
+                {
+                    x = UnityEngine.Random.Range(3, (int)boardWidth - 4);
+                    y = UnityEngine.Random.Range(0, (int)boardHeight - 1);
+
+                } while (GetBoardTile(new Vector2Int(x, y)).Occupied());
                 int unitIndex = UnityEngine.Random.Range(0, envirornment.Count);
                 BoardTile tile = GetBoardTile(x, y);
                 CreateBoardUnit(envirornment[unitIndex]).Move(tile);
@@ -114,6 +121,12 @@ public class GameBoard : MonoBehaviour
         {
             boardStateMachine.Update(new Vector2Int(-1, -1), this);
         }
+
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
+
     }
     void ResizeMesh(int width, int height)
     {
@@ -203,8 +216,8 @@ public class GameBoard : MonoBehaviour
             //if target empty
             if (endTile != null && endTile.Occupied() && !forcePush)
             {
-                endTile.Attack(1);
-                targetTile.Attack(1);
+                endTile.Attack(1, direction);
+                targetTile.Attack(1, direction);
             }
             //if target occupied and push is forced
             else if (
@@ -214,12 +227,12 @@ public class GameBoard : MonoBehaviour
                 BoardTile freeTile = GetFreeTile(targetTile.BoardPosition, direction);
                 if (freeTile == null)
                 {
-                    targetTile.Attack(100);
+                    targetTile.Attack(100, direction);
                 }
                 else
                 {
-                    endTile?.Attack(1);
-                    targetTile?.Attack(1);
+                    endTile?.Attack(1, direction);
+                    targetTile?.Attack(1, direction);
                     MoveUnit(targetTile.GetUnit, freeTile.BoardPosition);
                 }
             }

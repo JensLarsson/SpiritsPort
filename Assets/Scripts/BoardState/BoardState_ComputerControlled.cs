@@ -37,7 +37,7 @@ class BoardState_ComputerControlled : BoardState
                 List<BoardTile> targetableTiles = ability.GetLinearTiles(gameBoard, accessableTiles[index].BoardPosition, ability.movesThroughUnits);
                 foreach (BoardTile tile in targetableTiles)
                 {
-                    if (tile.Occupied() && tile?.GetUnit?.OwningPlayer != currentPlayer)
+                    if (tile.Occupied() && tile?.GetUnit?.OwningPlayer != currentPlayer && tile?.GetUnit?.Targetable == true)
                     {
                         ActionDelayer.RunAfterDelay(0.2f, () =>
                         {

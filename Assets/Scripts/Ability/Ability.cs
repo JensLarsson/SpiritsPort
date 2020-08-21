@@ -40,7 +40,7 @@ public class Ability : ScriptableObject
     public void Invoke(BoardTile casterTile, BoardTile targetTile, Action onHit)
     {
         casterTile?.GetUnit?.UseAbility();
-        onHit += () =>
+        onHit = () =>
         {
             targetTile?.Attack(
                 new AbilityParameters
@@ -71,7 +71,8 @@ public class Ability : ScriptableObject
                 targetTile.AddTileEffect(tileEffect);
             }
 
-        };
+        }
+        + onHit; //Places the original events of onHit in the end of the process
         if (projectilePrefab != null && !movesThroughOccupied) //Move onHit to when projectile reaches target
         {
             Instantiate(projectilePrefab).LinearTravel(casterTile.Position, targetTile.Position, onHit);
@@ -160,4 +161,5 @@ public struct AbilityParameters
     public Ability ability;
     public BoardTile casterTile;
     public BoardUnit caster;
+    public Vector2Int direction;
 }

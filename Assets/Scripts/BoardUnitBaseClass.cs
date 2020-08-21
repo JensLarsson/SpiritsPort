@@ -9,6 +9,7 @@ public abstract class BoardUnitBaseClass : MonoBehaviour
     public abstract BoardTile OccupiedTile { get; }
     public abstract bool Snared { get; }
     public abstract bool IsDead { get; }
+    public virtual bool Targetable => true;
     public abstract int CurrentHealth { get; set; }
     public abstract int MaxMovement { get; }
     public abstract List<Ability> Abilites { get; }

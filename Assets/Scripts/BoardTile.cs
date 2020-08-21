@@ -51,11 +51,11 @@ public class BoardTile : MonoBehaviour
             heldUnit.DealDamage(param);
         }
     }
-    public void Attack(int damage)
+    public void Attack(int damage, Vector2Int direction)
     {
         if (heldUnit != null)
         {
-            heldUnit.DealDamage(new AbilityParameters { damage = 1 });
+            heldUnit.DealDamage(new AbilityParameters { damage = 1, direction = direction });
         }
     }
 
