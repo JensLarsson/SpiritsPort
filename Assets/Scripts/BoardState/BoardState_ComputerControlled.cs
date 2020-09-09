@@ -19,10 +19,10 @@ class BoardState_ComputerControlled : BoardState
     public override void EnterState(GameBoard gameBoard, (int x, int y)[] positions = null)
     {
         units = new Queue<BoardUnitBaseClass>(gameBoard.GetAllUnitsOfFaction(currentPlayer));
-        UnitRound(gameBoard);
+        RandomUnitRound(gameBoard);
     }
 
-    void UnitRound(GameBoard gameBoard)
+    void RandomUnitRound(GameBoard gameBoard)
     {
         if (units.Count > 0)
         {
@@ -44,10 +44,9 @@ class BoardState_ComputerControlled : BoardState
                             gameBoard.MoveUnit(unit, accessableTiles[index].BoardPosition, true);
                             ActionDelayer.RunAfterDelay(0.5f, () =>
                             {
-                                ability.Invoke(unit.OccupiedTile, tile, () => { UnitRound(gameBoard); });
+                                ability.Invoke(unit.OccupiedTile, tile, () => { RandomUnitRound(gameBoard); });
                             });
                         });
-
                         abilityUsed = true;
                         break;
                     }
@@ -55,7 +54,7 @@ class BoardState_ComputerControlled : BoardState
             }
             if (!abilityUsed)
             {
-                UnitRound(gameBoard);
+                RandomUnitRound(gameBoard);
             }
         }
         else
