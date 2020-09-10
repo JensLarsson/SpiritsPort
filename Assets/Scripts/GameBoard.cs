@@ -22,6 +22,7 @@ public class GameBoard : MonoBehaviour
     [SerializeField] Player[] players = new Player[2];
     int currentPlayerIndex = 0;
     public Player CurrentPlayer => players[currentPlayerIndex];
+    public Player NotCurrentPlayer => players[(currentPlayerIndex + 1) % 2];
     Vector2Int lastMouseOverTile = new Vector2Int(-1, -1);
     BoardStateMachine boardStateMachine;
 
@@ -321,16 +322,16 @@ public class GameBoard : MonoBehaviour
     }
 
 
-    public bool[,] GetAccessibleTiles()
+    public int[,] GetAccessibleTiles()
     {
         int X = Board.GetLength(0);
         int Y = Board.GetLength(1);
-        bool[,] accessableTiles = new bool[X, Y];
+        int[,] accessableTiles = new int[X, Y];
         for (int x = 0; x < X; x++)
         {
             for (int y = 0; y < Y; y++)
             {
-                accessableTiles[x, y] = !Board[x, y].Occupied();
+                accessableTiles[x, y] = Board[x, y].Occupied() ? 99999 : 0;
             }
         }
         return accessableTiles;

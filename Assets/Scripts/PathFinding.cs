@@ -7,7 +7,15 @@ using UnityEngine;
 
 public class PathFinding
 {
-    public static bool[,] DijkstraPath(bool[,] accessableTiles, int maxDistance, Vector2Int startPos, bool movesThroughUnits = false)
+    static Vector2Int[] rotationArray = new Vector2Int[]
+{
+        new Vector2Int(0,1),
+        new Vector2Int(1,0),
+        new Vector2Int(0,-1),
+        new Vector2Int(-1,0),
+};
+
+    public static bool[,] DijkstraPath(int[,] accessableTiles, int maxDistance, Vector2Int startPos, bool movesThroughUnits = false)
     {
         // currently loops through already visiste positions, but It's fast enough for this right now
         Queue<Vector2Int> positionsToCheck = new Queue<Vector2Int>();
@@ -25,7 +33,7 @@ public class PathFinding
                 if (offsetPos.x >= 0 && offsetPos.x < accessableTiles.GetLength(0)
                     && offsetPos.y >= 0 && offsetPos.y < accessableTiles.GetLength(1))
                 {
-                    if (accessableTiles[offsetPos.x, offsetPos.y])
+                    if (accessableTiles[offsetPos.x, offsetPos.y] < 9000)
                     {
                         InRangeTiles[offsetPos.x, offsetPos.y] = true;
                         positionsToCheck.Enqueue(offsetPos);
@@ -49,5 +57,85 @@ public class PathFinding
         }
         return InRangeTiles;
     }
-}
 
+    public static List<WeightedTile> aStar(int[,] accessableTiles, Vector2Int startPos, List<Vector2Int> targets, bool movesThroughUnits = false)
+    {
+        Vector2Int target = targets[0];
+        List<WeightedTile> openList = new List<WeightedTile>()
+        {
+            new WeightedTile
+            {
+                pos = startPos,
+                weight = 0,
+                distFromTarget = Mathf.Abs( startPos.x-target.x)+ Mathf.Abs(startPos.y-target.y)
+            }
+        };
+        List<WeightedTile> closedList = new List<WeightedTile>();
+
+        Debug.Log(openList.Count);
+        while (openList.Count > 0)
+        {
+            int lightest = GetLightestTile(openList);
+            WeightedTile tile = openList[lightest];
+            openList.RemoveAt(lightest);
+            foreach (Vector2Int direction in rotationArray)
+            {
+                if (ListContains(openList, tile.pos + direction) > -1)
+                {
+                    break;
+                }
+                int i = ListContains(closedList, tile.pos + direction);
+                if (i > -1 && closedList[i].weight < tile.weight + 1)
+                {
+                    closedList[i].weight = tile.weight + 1;
+                    break;
+                }
+                WeightedTile newTile = new WeightedTile
+                {
+                    pos = tile.pos + direction,
+                    weight = tile.weight + 1,
+                    distFromTarget = Mathf.Abs(tile.pos.x - target.x) + Mathf.Abs(tile.pos.y - target.y)
+                };
+                if (target == (newTile.pos))
+                {
+                    closedList.Add(newTile);
+                    closedList.Add(tile);
+                    return closedList;
+                }
+                openList.Add(newTile);
+            }
+            closedList.Add(tile);
+        }
+        return closedList;
+    }
+
+    static int ListContains(List<WeightedTile> list, Vector2Int target)
+    {
+        for (int i = 0; i < list.Count; i++)
+        {
+            if (list[i].pos == target) return i;
+        }
+        return -1;
+    }
+    static int GetLightestTile(List<WeightedTile> tiles)
+    {
+        int lightest = 0;
+        //WeightedTile tile = tiles[lightest];
+        for (int i = 1; i < tiles.Count; i++)
+        {
+            if (tiles[i].distFromTarget < tiles[lightest].distFromTarget)
+            {
+                lightest = i;
+                //tile = tiles[i];
+            }
+        }
+        //tiles.RemoveAt(lightest);
+        return lightest;
+    }
+}
+public class WeightedTile
+{
+    public Vector2Int pos;
+    public int weight;
+    public int distFromTarget;
+}

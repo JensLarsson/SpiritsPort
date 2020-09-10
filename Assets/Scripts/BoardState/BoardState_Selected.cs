@@ -25,6 +25,15 @@ public class BoardState_Selected : BoardState
             }
         }
         gameBoard.SetSelectionMarker(selectedTile);
+        var path = PathFinding.aStar(
+             gameBoard.GetAccessibleTiles(), selectedTile.BoardPosition, new List<Vector2Int>()
+             {
+                gameBoard.GetAllUnitsOfFaction(gameBoard.NotCurrentPlayer)[0].OccupiedTile.BoardPosition
+             });
+        foreach (var tile in path)
+        {
+            Debug.Log(tile.pos + " " + tile.weight);
+        }
     }
 
     public override void Interact(GameBoard gameBoard, Vector2Int position)
@@ -46,7 +55,7 @@ public class BoardState_Selected : BoardState
         }
         gameBoard.ChangeState(new BoardState_UnSelected(gameBoard.CurrentPlayer));
     }
- 
+
 
     public override void LeaveState(GameBoard gameBoard)
     {
