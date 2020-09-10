@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BoardTurnInfo : Object
+public class BoardTurnInfo : GameBoard
 {
-    public int i = 4;
-    public BoardTurnInfo Clone()
-    {
-        return (BoardTurnInfo)this.MemberwiseClone();
-    }
+
+
+}
+public struct TileTurnInfo
+{
+    int health;
+    int speed;
+    List<Ability> abilities;
 }
