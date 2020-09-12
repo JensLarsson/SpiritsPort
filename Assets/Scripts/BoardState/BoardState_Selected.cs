@@ -34,6 +34,10 @@ public class BoardState_Selected : BoardState
         {
             Debug.Log(tile.pos + " " + tile.weight);
         }
+        Vector2Int a = new Vector2Int(1, 1);
+        Vector2Int b = new Vector2Int(1, 0);
+
+        Debug.Log(a == b + new Vector2Int(0, 1));
     }
 
     public override void Interact(GameBoard gameBoard, Vector2Int position)

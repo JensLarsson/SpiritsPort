@@ -77,33 +77,43 @@ public class PathFinding
         {
             int lightest = GetLightestTile(openList);
             WeightedTile tile = openList[lightest];
-            openList.RemoveAt(lightest);
             foreach (Vector2Int direction in rotationArray)
             {
-                if (ListContains(openList, tile.pos + direction) > -1)
+                Vector2Int newPos = tile.pos + direction;
+                if (newPos.x < 0 || newPos.y < 0 || newPos.x >= accessableTiles.GetLength(0) || newPos.y >= accessableTiles.GetLength(1))
                 {
                     break;
                 }
-                int i = ListContains(closedList, tile.pos + direction);
-                if (i > -1 && closedList[i].weight < tile.weight + 1)
+                if (ListContains(openList, newPos) > -1)
                 {
-                    closedList[i].weight = tile.weight + 1;
                     break;
                 }
+                int i = ListContains(closedList, newPos);
+                if (i > -1)
+                {
+                    if (closedList[i].weight > tile.weight + accessableTiles[tile.pos.x, tile.pos.y])
+                    {
+                        closedList[i].weight = tile.weight + accessableTiles[tile.pos.x, tile.pos.y];
+                    }
+                    break;
+                }
+
                 WeightedTile newTile = new WeightedTile
                 {
-                    pos = tile.pos + direction,
-                    weight = tile.weight + 1,
+                    pos = newPos,
+                    weight = tile.weight + accessableTiles[newPos.x, newPos.y],
                     distFromTarget = Mathf.Abs(tile.pos.x - target.x) + Mathf.Abs(tile.pos.y - target.y)
                 };
                 if (target == (newTile.pos))
                 {
                     closedList.Add(newTile);
                     closedList.Add(tile);
+                    Debug.Log("Target found at " + newTile.pos);
                     return closedList;
                 }
                 openList.Add(newTile);
             }
+            openList.RemoveAt(lightest);
             closedList.Add(tile);
         }
         return closedList;
@@ -123,7 +133,7 @@ public class PathFinding
         //WeightedTile tile = tiles[lightest];
         for (int i = 1; i < tiles.Count; i++)
         {
-            if (tiles[i].distFromTarget < tiles[lightest].distFromTarget)
+            if (tiles[i].weight + tiles[i].distFromTarget < tiles[lightest].weight + tiles[lightest].distFromTarget)
             {
                 lightest = i;
                 //tile = tiles[i];

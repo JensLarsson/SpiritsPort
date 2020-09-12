@@ -331,7 +331,7 @@ public class GameBoard : MonoBehaviour
         {
             for (int y = 0; y < Y; y++)
             {
-                accessableTiles[x, y] = Board[x, y].Occupied() ? 99999 : 0;
+                accessableTiles[x, y] = Board[x, y].Occupied() ? 99999 : 1;
             }
         }
         return accessableTiles;
