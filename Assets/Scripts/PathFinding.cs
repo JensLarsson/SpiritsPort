@@ -58,21 +58,21 @@ public class PathFinding
         return InRangeTiles;
     }
 
-    public static List<WeightedTile> aStar(int[,] accessableTiles, Vector2Int startPos, List<Vector2Int> targets, bool movesThroughUnits = false)
+    public static List<WeightedTile> aStar( int[,] accessableTiles, Vector2Int startPos, List<Vector2Int> targets, bool movesThroughUnits = false)
     {
-        Vector2Int target = targets[0];
+        Vector2Int target = ClosestPosition(startPos, targets);
+        Debug.Log(target);
         List<WeightedTile> openList = new List<WeightedTile>()
         {
             new WeightedTile
             {
                 pos = startPos,
-                weight = 0,
+                traveled = 0,
                 distFromTarget = Mathf.Abs( startPos.x-target.x)+ Mathf.Abs(startPos.y-target.y)
             }
         };
         List<WeightedTile> closedList = new List<WeightedTile>();
 
-        Debug.Log(openList.Count);
         while (openList.Count > 0)
         {
             int lightest = GetLightestTile(openList);
@@ -80,35 +80,36 @@ public class PathFinding
             foreach (Vector2Int direction in rotationArray)
             {
                 Vector2Int newPos = tile.pos + direction;
+                //Skip if outside board, in ClosedList, or in Open List
                 if (newPos.x < 0 || newPos.y < 0 || newPos.x >= accessableTiles.GetLength(0) || newPos.y >= accessableTiles.GetLength(1))
                 {
-                    break;
+                    continue;
                 }
                 if (ListContains(openList, newPos) > -1)
                 {
-                    break;
+                    continue;
                 }
                 int i = ListContains(closedList, newPos);
                 if (i > -1)
                 {
-                    if (closedList[i].weight > tile.weight + accessableTiles[tile.pos.x, tile.pos.y])
+                    if (closedList[i].traveled > tile.traveled + accessableTiles[tile.pos.x, tile.pos.y])
                     {
-                        closedList[i].weight = tile.weight + accessableTiles[tile.pos.x, tile.pos.y];
+                        closedList[i].traveled = tile.traveled + accessableTiles[tile.pos.x, tile.pos.y];
                     }
-                    break;
+                    continue;
                 }
 
                 WeightedTile newTile = new WeightedTile
                 {
                     pos = newPos,
-                    weight = tile.weight + accessableTiles[newPos.x, newPos.y],
-                    distFromTarget = Mathf.Abs(tile.pos.x - target.x) + Mathf.Abs(tile.pos.y - target.y)
+                    traveled = tile.traveled + accessableTiles[newPos.x, newPos.y],
+                    distFromTarget = Mathf.Abs(newPos.x - target.x) + Mathf.Abs(newPos.y - target.y)
                 };
+                //If at the closest enemy
                 if (target == (newTile.pos))
                 {
                     closedList.Add(newTile);
                     closedList.Add(tile);
-                    Debug.Log("Target found at " + newTile.pos);
                     return closedList;
                 }
                 openList.Add(newTile);
@@ -133,7 +134,7 @@ public class PathFinding
         //WeightedTile tile = tiles[lightest];
         for (int i = 1; i < tiles.Count; i++)
         {
-            if (tiles[i].weight + tiles[i].distFromTarget < tiles[lightest].weight + tiles[lightest].distFromTarget)
+            if (tiles[i].traveled + tiles[i].distFromTarget < tiles[lightest].traveled + tiles[lightest].distFromTarget)
             {
                 lightest = i;
                 //tile = tiles[i];
@@ -142,10 +143,26 @@ public class PathFinding
         //tiles.RemoveAt(lightest);
         return lightest;
     }
+    static Vector2Int ClosestPosition(Vector2Int from, List<Vector2Int> to)
+    {
+        if (to.Count < 1)
+        {
+            return new Vector2Int(-1, -1);
+        }
+        Vector2Int closest = to[0];
+        for (int i = 1; i < to.Count; i++)
+        {
+            if (Vector2Int.Distance(from, closest) > Vector2Int.Distance(from, to[i]))
+            {
+                closest = to[i];
+            }
+        }
+        return closest;
+    }
 }
 public class WeightedTile
 {
     public Vector2Int pos;
-    public int weight;
+    public int traveled;
     public int distFromTarget;
 }
