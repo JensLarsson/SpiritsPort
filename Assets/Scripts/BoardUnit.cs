@@ -219,6 +219,7 @@ public class BoardUnit : BoardUnitBaseClass
     public override Player OwningPlayer => owningPlayer;
     public override BoardTile OccupiedTile => occupiedTile;
     public override Vector2 Position => OccupiedTile.Position;
+    public Vector2Int BoardPosition => OccupiedTile.BoardPosition;
     public override List<Ability> Abilites => abilities;
     public override Sprite Icon => icon;
     public override int MaxHealth => maxHealth;

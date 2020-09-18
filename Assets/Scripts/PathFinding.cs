@@ -58,7 +58,7 @@ public class PathFinding
         return InRangeTiles;
     }
 
-    public static List<WeightedTile> aStar(int[,] accessableTiles, Vector2Int startPos, List<Vector2Int> targets, bool movesThroughUnits = false)
+    public static List<WeightedTile> aStar(int[,] accessableTiles, Vector2Int startPos, List<Vector2Int> targets, int maxMoves = 99, bool movesThroughUnits = false)
     {
         Vector2Int target = targets[0];
         List<WeightedTile> openList = new List<WeightedTile>()
@@ -71,20 +71,24 @@ public class PathFinding
             }
         };
         List<WeightedTile> closedList = new List<WeightedTile>();
-
-        Debug.Log(openList.Count);
+        int test = 0;
         while (openList.Count > 0)
         {
+            test = Math.Max(test, openList.Count);
             int lightest = GetLightestTile(openList);
             WeightedTile tile = openList[lightest];
             openList.RemoveAt(lightest);
+            closedList.Add(tile);
             foreach (Vector2Int direction in rotationArray)
             {
-                if (ListContains(openList, tile.pos + direction) > -1)
+                Vector2Int newpos = tile.pos + direction;
+                if (newpos.x < 0 || newpos.y < 0 
+                    || newpos.x >= accessableTiles.GetLength(0) || newpos.y >= accessableTiles.GetLength(1)
+                    || ListContains(openList, newpos) > -1)
                 {
                     break;
                 }
-                int i = ListContains(closedList, tile.pos + direction);
+                int i = ListContains(closedList, newpos);
                 if (i > -1 && closedList[i].weight < tile.weight + 1)
                 {
                     closedList[i].weight = tile.weight + 1;
@@ -92,7 +96,7 @@ public class PathFinding
                 }
                 WeightedTile newTile = new WeightedTile
                 {
-                    pos = tile.pos + direction,
+                    pos = newpos,
                     weight = tile.weight + 1,
                     distFromTarget = Mathf.Abs(tile.pos.x - target.x) + Mathf.Abs(tile.pos.y - target.y)
                 };
@@ -102,9 +106,15 @@ public class PathFinding
                     closedList.Add(tile);
                     return closedList;
                 }
-                openList.Add(newTile);
+                if (newTile.weight < maxMoves)
+                {
+                    openList.Add(newTile);
+                }
+                else if (newTile.weight == maxMoves)
+                {
+                    closedList.Add(newTile);
+                }
             }
-            closedList.Add(tile);
         }
         return closedList;
     }

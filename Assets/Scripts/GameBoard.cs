@@ -204,7 +204,7 @@ public class GameBoard : MonoBehaviour
     /// <param name="targetTile"></param>
     public void PushUnit(BoardTile casterTile, BoardTile targetTile, bool forcePush = false)
     {
-        if (targetTile.GetUnit != null && targetTile.GetUnit.Pushable)
+        if (targetTile?.GetUnit != null && targetTile.GetUnit.Pushable)
         {
             Vector2Int direction = (targetTile.BoardPosition - casterTile.BoardPosition);
             direction.Clamp(new Vector2Int(-1, -1), new Vector2Int(1, 1));

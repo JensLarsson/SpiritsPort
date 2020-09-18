@@ -146,7 +146,7 @@ public class Ability : ScriptableObject
     public Sprite Icon => icon;
     public bool PushesTarget => pushesTarget;
     public bool movesThroughUnits => movesThroughOccupied;
-
+    public int Damage => damage;
     [Serializable]
     class OnHitTargetEffect
     {
