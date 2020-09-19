@@ -10,13 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 96c49b409b73e1345879da4ea7434560, type: 3}
-  m_Name: Player
+  m_Name: Enemy 1
   m_EditorClassIdentifier: 
   playerName: 
-  playerColour: {r: 0, g: 1, b: 0.43849897, a: 1}
+  playerColour: {r: 0.6981132, g: 0.28648987, b: 0.52102005, a: 1}
   creatures:
-  - {fileID: 1872410055, guid: 830e974d4cfdf2548ada44f398c3bbdc, type: 3}
-  - {fileID: 1872410055, guid: 830e974d4cfdf2548ada44f398c3bbdc, type: 3}
-  - {fileID: 1872410055, guid: 830e974d4cfdf2548ada44f398c3bbdc, type: 3}
-  - {fileID: 1872410055, guid: 511012ded7ac43547984bf82a726f47e, type: 3}
-  isComputer: 0
+  - {fileID: 7665822514228566404, guid: d73bcadb1c693a648bdf9c95d19a47b8, type: 3}
+  - {fileID: 1872410055, guid: 973b5906c70753440b69c3b379b1c056, type: 3}
+  - {fileID: 1872410055, guid: 973b5906c70753440b69c3b379b1c056, type: 3}
+  isComputer: 1

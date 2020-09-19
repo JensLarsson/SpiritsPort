@@ -52,7 +52,7 @@ class BoardState_PlaceUnits : BoardState
                 selectedUnit.transform.position = tile.transform.position;
             }
         }
-        if (Input.GetButtonDown(KeyBindingLibrary.EndTurn) && creatures.Count < 1)
+        if (Input.GetButtonDown(KeyBindingLibrary.EndTurn) && creatures.Count < 1 && selectedUnit == null)
         {
             gameBoard.ChangeState(upcommingState);
             if (selectedUnit != null)

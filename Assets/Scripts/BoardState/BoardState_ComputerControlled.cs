@@ -10,8 +10,8 @@ using UnityEngine;
 class BoardState_ComputerControlled : BoardState
 {
     Player currentPlayer;
-    Queue<BoardUnitBaseClass> playerUnits;
-    List<Vector2Int> enemyPositions = new List<Vector2Int>();
+    Queue<BoardUnitBaseClass> computerUnits;
+    Queue<BoardUnitBaseClass> enemyUnits;
     public BoardState_ComputerControlled(Player player)
     {
         currentPlayer = player;
@@ -19,65 +19,31 @@ class BoardState_ComputerControlled : BoardState
 
     public override void EnterState(GameBoard gameBoard, (int x, int y)[] positions = null)
     {
-        playerUnits = new Queue<BoardUnitBaseClass>(gameBoard.GetAllUnitsOfFaction(currentPlayer));
-        var enemies = gameBoard.GetAllUnitsOfFaction(gameBoard.NotCurrentPlayer);
-        foreach (BoardUnitBaseClass enemy in enemies)
-        {
-            enemyPositions.Add(((BoardUnit)enemy).BoardPosition);
-        }
+        computerUnits = new Queue<BoardUnitBaseClass>(gameBoard.GetAllUnitsOfFaction(currentPlayer));
+        enemyUnits = new Queue<BoardUnitBaseClass>(gameBoard.GetAllUnitsOfFaction(gameBoard.NotCurrentPlayer));
+
 
 
 
         int i = 0;
-        //BoardTurnInfo BestMove = MinMaxSearch(gameBoard, new BoardTurnInfo(gameBoard.Board, gameBoard.CurrentPlayer), new Queue<BoardUnitBaseClass>(playerUnits), ref i);
-        //Debug.Log(i);
-        //MinMaxRoundEngage(gameBoard, BestMove);
-
-        System.Diagnostics.Stopwatch a = new System.Diagnostics.Stopwatch();
-        List<BoardUnitBaseClass> derp = new List<BoardUnitBaseClass>(playerUnits);
-        a.Start();
-        PathFinding.DijkstraPath(gameBoard.GetAccessibleTiles(), 3, playerUnits.Peek().OccupiedTile.BoardPosition);
-        a.Stop();
-        Debug.Log(a.ElapsedTicks);
-        a.Reset();
-        a.Start();
-        var test = PathFinding.aStar(gameBoard.GetAccessibleTiles(), derp[0].OccupiedTile.BoardPosition, enemyPositions, derp[0].MaxMovement);
-        a.Stop();
-        Debug.Log(a.ElapsedTicks);
-        Debug.Log("tiles: " + test.Count());
-        foreach (var tile in test)
-        {
-            Debug.Log(tile.pos);
-            gameBoard.GetBoardTile(tile.pos).SetState(TILE_MODE.AttackAllowed);
-        }
-        //a.Reset();
-        //a.Start();
-        //test = PathFinding.aStar(gameBoard.GetAccessibleTiles(), derp[1].OccupiedTile.BoardPosition, enemyPositions, derp[1].MaxMovement);
-        //a.Stop();
-        //Debug.Log(a.ElapsedTicks);
-        //Debug.Log("tiles: " + test.Count()); foreach (var tile in test)
-        //{
-        //    gameBoard.GetBoardTile(tile.pos).SetState(TILE_MODE.AttackAllowed);
-        //}
-        //a.Reset();
-        //a.Start();
-        //test = PathFinding.aStar(gameBoard.GetAccessibleTiles(), derp[2].OccupiedTile.BoardPosition, enemyPositions, derp[2].MaxMovement);
-        //a.Stop();
-        //Debug.Log(a.ElapsedTicks);
-        //Debug.Log("tiles: " + test.Count());
-        foreach (var tile in test)
-        {
-            gameBoard.GetBoardTile(tile.pos).SetState(TILE_MODE.AttackAllowed);
-        }
+        //BoardTurnInfo BestMove = MaxTurn(gameBoard, new BoardTurnInfo(gameBoard.Board, gameBoard.CurrentPlayer), new Queue<BoardUnitBaseClass>(playerUnits), ref i);
+        BoardTurnInfo BestMove = MiniMax(gameBoard, new BoardTurnInfo(gameBoard.Board, gameBoard.CurrentPlayer),
+            new Queue<BoardUnitBaseClass>[] {
+            new Queue<BoardUnitBaseClass>(computerUnits),
+            new Queue<BoardUnitBaseClass>(enemyUnits)
+            },
+            ref i);
+        Debug.Log(i);
+        MinMaxRoundEngage(gameBoard, BestMove, computerUnits.Count);
 
         //RandomUnitRound(gameBoard);
     }
 
     void RandomUnitRound(GameBoard gameBoard)
     {
-        if (playerUnits.Count > 0)
+        if (computerUnits.Count > 0)
         {
-            BoardUnit unit = playerUnits.Dequeue() as BoardUnit;
+            BoardUnit unit = computerUnits.Dequeue() as BoardUnit;
             List<BoardTile> accessableTiles = GetAccessableTiles(gameBoard, unit);
             int offset = Random.Range(0, accessableTiles.Count);
             bool abilityUsed = false;
@@ -114,57 +80,90 @@ class BoardState_ComputerControlled : BoardState
         }
     }
 
-    BoardTurnInfo MinMaxSearch(GameBoard gameBoard, BoardTurnInfo state, Queue<BoardUnitBaseClass> units, ref int count)
+    BoardTurnInfo MaxTurn(GameBoard gameBoard, BoardTurnInfo state, Queue<BoardUnitBaseClass> units, ref int count, bool maximizing = true)
     {
+        count++;
         BoardTurnInfo bestState = state;
         if (units.Count > 0)
         {
-            count++;
             BoardUnit unit = units.Dequeue() as BoardUnit;
-            //List<BoardTile> accessableTiles = GetAccessableTiles(gameBoard, unit);
-            List<WeightedTile> accessableTiles = PathFinding.aStar(gameBoard.GetAccessibleTiles(), unit.BoardPosition, enemyPositions, unit.MaxMovement);
-            for (int i = 0; i < accessableTiles.Count; i++)
+            Stack<Vector2Int> accessableTiles = state.GetAccessableTiles(unit.BoardPosition, unit.MaxMovement);
+            //List<WeightedTile> accessableTiles = PathFinding.aStar(gameBoard.GetAccessibleTiles(), unit.BoardPosition, enemyPositions, unit.MaxMovement);
+            while (accessableTiles.Count > 0)
             {
+                Vector2Int pos = accessableTiles.Pop();
                 Ability ability = unit.Abilites[0];
-                List<BoardTile> targetableTiles = ability.GetLinearTiles(gameBoard, accessableTiles[i].pos, ability.movesThroughUnits);
+                List<BoardTile> targetableTiles = ability.GetLinearTiles(gameBoard, pos, ability.movesThroughUnits);
                 foreach (BoardTile tile in targetableTiles)
                 {
                     BoardTurnInfo stateClone = state.Clone();
-                    stateClone.Move(unit.OccupiedTile.BoardPosition, accessableTiles[i].pos);
+                    stateClone.Move(unit.OccupiedTile.BoardPosition, pos);
                     stateClone.DamageTile(tile.BoardPosition, ability);
 
-                    BoardTurnInfo recursionState = MinMaxSearch(gameBoard, stateClone, new Queue<BoardUnitBaseClass>(units), ref count);
-                    if (recursionState.turnValue > bestState.turnValue)
-                    {
-                        bestState = recursionState;
-                    }
+                    BoardTurnInfo recursionState = MaxTurn(gameBoard, stateClone, new Queue<BoardUnitBaseClass>(units), ref count);
+                    bestState = maximizing ?
+                        (recursionState.turnValue > bestState.turnValue ? recursionState : bestState)
+                        :
+                        (recursionState.turnValue < bestState.turnValue ? recursionState : bestState);
                 }
             }
         }
         return bestState;
     }
 
-    void MinMaxRoundEngage(GameBoard gameBoard, BoardTurnInfo turnInfo)
+    //BoardTurnInfo MaxTurn(GameBoard gameBoard, BoardTurnInfo state, Queue<BoardUnitBaseClass> units, ref int count, bool maximizing = true)
+    //{
+    //    count++;
+    //    BoardTurnInfo bestState = state;
+    //    if (units.Count > 0)
+    //    {
+    //        BoardUnit unit = units.Dequeue() as BoardUnit;
+    //        Stack<Vector2Int> accessableTiles = state.GetAccessableTiles(unit.BoardPosition, unit.MaxMovement);
+    //        //List<WeightedTile> accessableTiles = PathFinding.aStar(gameBoard.GetAccessibleTiles(), unit.BoardPosition, enemyPositions, unit.MaxMovement);
+    //        for (int i = 0; i < accessableTiles.Count; i++)
+    //        {
+    //            Ability ability = unit.Abilites[0];
+    //            List<BoardTile> targetableTiles = ability.GetLinearTiles(gameBoard, gameBoard.GetBoardTile(accessableTiles[i]), ability.movesThroughUnits);
+    //            foreach (BoardTile tile in targetableTiles)
+    //            {
+    //                BoardTurnInfo stateClone = state.Clone();
+    //                stateClone.Move(unit.OccupiedTile.BoardPosition, accessableTiles[i]);
+    //                stateClone.DamageTile(tile.BoardPosition, ability);
+
+    //                BoardTurnInfo recursionState = MaxTurn(gameBoard, stateClone, new Queue<BoardUnitBaseClass>(units), ref count);
+    //                bestState = maximizing ?
+    //                    (recursionState.turnValue > bestState.turnValue ? recursionState : bestState)
+    //                    :
+    //                    (recursionState.turnValue < bestState.turnValue ? recursionState : bestState);
+    //            }
+    //        }
+    //    }
+    //    return bestState;
+    //}
+
+    BoardTurnInfo MiniMax(GameBoard gameBoard, BoardTurnInfo state, Queue<BoardUnitBaseClass>[] units, ref int count, bool maximizing = true, int depth = 0)
     {
-        if (turnInfo.abilities.Count > 0 && turnInfo.moves.Count > 0)
+        if (depth == 3)
         {
-            var move = turnInfo.moves.Dequeue();
-            var abilityInfo = turnInfo.abilities.Dequeue();
-            Debug.Log(move.to);
-            Debug.Log(abilityInfo.pos);
-            BoardTile tile = gameBoard.GetBoardTile(move.from);
-            gameBoard.MoveUnit(tile.GetUnit, move.to);
-            abilityInfo.ability.Invoke(gameBoard.GetBoardTile(move.to), gameBoard.GetBoardTile(abilityInfo.pos),
-                () =>
-                {
-                    MinMaxRoundEngage(gameBoard, turnInfo);
-                });
+            return state;
+        }
+        if (maximizing)
+        {
+            BoardTurnInfo newState = MaxTurn(gameBoard, state.Clone(), new Queue<BoardUnitBaseClass>(units[0]), ref count, true);
+            return MiniMax(gameBoard, newState, units, ref count, false, depth + 1);
         }
         else
         {
-            gameBoard.EndTurn();
+            BoardTurnInfo newState = MaxTurn(gameBoard, state.Clone(), new Queue<BoardUnitBaseClass>(units[1]), ref count, false);
+            return MiniMax(gameBoard, newState, units, ref count, true, depth + 1);
         }
+        return state;
     }
+
+    //List<BoardTile> GetAccessableTiles(BoardTurnInfo gameBoard, BoardUnit unit)
+    //{
+
+    //}
     List<BoardTile> GetAccessableTiles(GameBoard gameBoard, BoardUnit unit)
     {
         bool[,] tileAccesArray = PathFinding.DijkstraPath(gameBoard.GetAccessibleTiles(),
@@ -182,6 +181,26 @@ class BoardState_ComputerControlled : BoardState
         }
         return accessableTiles;
     }
+    void MinMaxRoundEngage(GameBoard gameBoard, BoardTurnInfo turnInfo, int units)
+    {
+        if (units > 0)
+        {
+            var move = turnInfo.moves.Dequeue();
+            var abilityInfo = turnInfo.abilities.Dequeue();
+            BoardTile tile = gameBoard.GetBoardTile(move.from);
+            gameBoard.MoveUnit(tile.GetUnit, move.to);
+            abilityInfo.ability.Invoke(gameBoard.GetBoardTile(move.to), gameBoard.GetBoardTile(abilityInfo.pos),
+                () =>
+                {
+                    MinMaxRoundEngage(gameBoard, turnInfo, units - 1);
+                });
+        }
+        else
+        {
+            gameBoard.EndTurn();
+        }
+    }
+
 
 
 

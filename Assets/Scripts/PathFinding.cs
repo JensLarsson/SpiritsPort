@@ -58,10 +58,9 @@ public class PathFinding
         return InRangeTiles;
     }
 
-    public static List<WeightedTile> aStar( int[,] accessableTiles, Vector2Int startPos, List<Vector2Int> targets, bool movesThroughUnits = false)
+    public static List<WeightedTile> aStar(int[,] accessableTiles, Vector2Int startPos, List<Vector2Int> targets, int maxMoves = 99, bool movesThroughUnits = false)
     {
         Vector2Int target = ClosestPosition(startPos, targets);
-        Debug.Log(target);
         List<WeightedTile> openList = new List<WeightedTile>()
         {
             new WeightedTile
@@ -74,7 +73,6 @@ public class PathFinding
         List<WeightedTile> closedList = new List<WeightedTile>();
         while (openList.Count > 0)
         {
-            test = Math.Max(test, openList.Count);
             int lightest = GetLightestTile(openList);
             WeightedTile tile = openList[lightest];
             foreach (Vector2Int direction in rotationArray)
@@ -110,16 +108,8 @@ public class PathFinding
                 {
                     closedList.Add(newTile);
                     closedList.Add(tile);
-                    return closedList;
                 }
-                if (newTile.weight < maxMoves)
-                {
-                    openList.Add(newTile);
-                }
-                else if (newTile.weight == maxMoves)
-                {
-                    closedList.Add(newTile);
-                }
+                openList.Add(newTile);
             }
             openList.RemoveAt(lightest);
             closedList.Add(tile);
