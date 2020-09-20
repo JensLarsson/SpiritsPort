@@ -10,13 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 96c49b409b73e1345879da4ea7434560, type: 3}
-  m_Name: Player
+  m_Name: Player 1
   m_EditorClassIdentifier: 
   playerName: 
   playerColour: {r: 0, g: 1, b: 0.43849897, a: 1}
   creatures:
   - {fileID: 1872410055, guid: 830e974d4cfdf2548ada44f398c3bbdc, type: 3}
-  - {fileID: 1872410055, guid: 830e974d4cfdf2548ada44f398c3bbdc, type: 3}
-  - {fileID: 1872410055, guid: 830e974d4cfdf2548ada44f398c3bbdc, type: 3}
-  - {fileID: 1872410055, guid: 511012ded7ac43547984bf82a726f47e, type: 3}
   isComputer: 0

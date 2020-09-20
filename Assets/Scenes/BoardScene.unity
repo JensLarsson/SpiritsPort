@@ -4212,15 +4212,15 @@ MonoBehaviour:
     type: 3}
   SelectionIcon: {fileID: 6395483982974707595, guid: 3b656fa22ea99bd4bb532f82ebb698ec,
     type: 3}
-  enviromentalObjects: 5
+  enviromentalObjects: 1
   envirornment:
   - {fileID: 545833667324079104, guid: b400fa118727ad64db036c5b961f6d96, type: 3}
   - {fileID: 7639459011550990588, guid: 6106fdda2e16737428b66590ac9b97c7, type: 3}
   DustEffect: {fileID: 691305714152550889, guid: 70cf9fbd75257104b8a24c280700bd9d,
     type: 3}
   players:
-  - {fileID: 11400000, guid: 5523218d1802e544d81224ad2fa02c5a, type: 2}
-  - {fileID: 11400000, guid: c4697b93238f32d42a04aae6c7f6bc8c, type: 2}
+  - {fileID: 11400000, guid: 892af0a3bf0522d4dad4427b90065a23, type: 2}
+  - {fileID: 11400000, guid: 7fa7ff25dd35c68469cabd9ee5cf7ca0, type: 2}
 --- !u!64 &907500149
 MeshCollider:
   m_ObjectHideFlags: 0

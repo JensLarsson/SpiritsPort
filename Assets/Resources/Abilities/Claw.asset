@@ -20,6 +20,7 @@ MonoBehaviour:
   maxRange: 1
   damage: 1
   overTimeEffect: {fileID: 0}
+  tileEffect: {fileID: 0}
   projectilePrefab: {fileID: 0}
   onHitParticleEffect: {fileID: 4023494270084847592, guid: 59c59fdec25bb16478698e38c2c0ca64,
     type: 3}
