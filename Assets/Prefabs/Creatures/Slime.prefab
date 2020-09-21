@@ -1174,7 +1174,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 3
-  maxMovement: 3
+  maxMovement: 1
   abilities:
   - {fileID: 11400000, guid: e2becda0b2668ca449d2eb725d8f28fb, type: 2}
   icon: {fileID: 21300000, guid: cf477cf86ea06ff47aab988a32f6572a, type: 3}

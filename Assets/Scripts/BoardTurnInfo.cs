@@ -8,7 +8,7 @@ public class BoardTurnInfo
 {
     const int ENEMY_MULTIPLIER = 50;
     const int ENVIRORNMENT_MULTIPLIER = 10;
-    const int FRIEND_MULTIPLIER = -51;
+    const int FRIEND_MULTIPLIER = -49;
     const int KILL_MULTIPLIER = 30;
 
 
@@ -16,6 +16,7 @@ public class BoardTurnInfo
     public Queue<(Vector2Int from, Vector2Int to)> moves { get; private set; }
     public Queue<(Ability ability, Vector2Int pos)> abilities { get; private set; }
     public int turnValue { get; private set; }
+    public int TempValue;
     public BoardTurnInfo(TileTurnInfo[,] board, int value, Queue<(Vector2Int from, Vector2Int to)> moveQueue, Queue<(Ability ability, Vector2Int pos)> abilityQueue)
     {
         boardInfo = board;
@@ -81,9 +82,10 @@ public class BoardTurnInfo
         }
         //turnValue += negative ? -(int)Vector2Int.Distance(from, to) : (int)Vector2Int.Distance(from, to);
     }
-    public void DamageTile(Vector2Int target, Ability ability)
+    public bool DamageTile(Vector2Int target, Ability ability)
     {
         abilities.Enqueue((ability, target));
+        bool empty = boardInfo[target.x, target.y].target == TargetType.Empty;
         boardInfo[target.x, target.y].health -= ability.Damage;
         int enemyMultiplier = targetMultiplier(target.x, target.y);
         bool killed = boardInfo[target.x, target.y].health <= 0;
@@ -96,6 +98,7 @@ public class BoardTurnInfo
         {
             boardInfo[target.x, target.y] = new TileTurnInfo { health = 0, target = TargetType.Empty };
         }
+        return !empty;
     }
 
     public Queue<TileTurnInfo> GetUnitTiles(TargetType type)
@@ -122,7 +125,7 @@ public class BoardTurnInfo
                 return ENEMY_MULTIPLIER;
             case TargetType.Envirornment:
                 return ENVIRORNMENT_MULTIPLIER;
-            default: return 0;
+            default: return 1;
         }
     }
 

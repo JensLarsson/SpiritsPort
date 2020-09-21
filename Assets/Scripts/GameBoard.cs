@@ -85,7 +85,7 @@ public class GameBoard : MonoBehaviour
                 int y;
                 do
                 {
-                    x = UnityEngine.Random.Range(3, (int)boardWidth - 4);
+                    x = UnityEngine.Random.Range(1, (int)boardWidth - 2);
                     y = UnityEngine.Random.Range(0, (int)boardHeight - 1);
 
                 } while (GetBoardTile(new Vector2Int(x, y)).Occupied());

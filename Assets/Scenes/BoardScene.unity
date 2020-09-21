@@ -4212,7 +4212,7 @@ MonoBehaviour:
     type: 3}
   SelectionIcon: {fileID: 6395483982974707595, guid: 3b656fa22ea99bd4bb532f82ebb698ec,
     type: 3}
-  enviromentalObjects: 1
+  enviromentalObjects: 10
   envirornment:
   - {fileID: 545833667324079104, guid: b400fa118727ad64db036c5b961f6d96, type: 3}
   - {fileID: 7639459011550990588, guid: 6106fdda2e16737428b66590ac9b97c7, type: 3}
