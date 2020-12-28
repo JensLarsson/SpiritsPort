@@ -17,7 +17,7 @@ public class GameBoard : MonoBehaviour
 
     [SerializeField] Slider miniMaxDepthSlider;
     [SerializeField] Toggle miniMaxToggle;
-    public bool useMiniMax => miniMaxToggle;
+    public bool useMiniMax => miniMaxToggle.isOn;
     public int miniMaxDepth => Mathf.RoundToInt(miniMaxDepthSlider.value);
 
     public BoardTile[,] Board { get; private set; }

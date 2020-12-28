@@ -4747,8 +4747,8 @@ MonoBehaviour:
   miniMaxDepthSlider: {fileID: 790506496}
   miniMaxToggle: {fileID: 1851662099}
   players:
-  - {fileID: 11400000, guid: 892af0a3bf0522d4dad4427b90065a23, type: 2}
-  - {fileID: 11400000, guid: 7fa7ff25dd35c68469cabd9ee5cf7ca0, type: 2}
+  - {fileID: 11400000, guid: 5523218d1802e544d81224ad2fa02c5a, type: 2}
+  - {fileID: 11400000, guid: c4697b93238f32d42a04aae6c7f6bc8c, type: 2}
 --- !u!64 &907500149
 MeshCollider:
   m_ObjectHideFlags: 0

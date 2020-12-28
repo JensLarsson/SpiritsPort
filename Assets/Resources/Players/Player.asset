@@ -16,7 +16,5 @@ MonoBehaviour:
   playerColour: {r: 0, g: 1, b: 0.43849897, a: 1}
   creatures:
   - {fileID: 1872410055, guid: 830e974d4cfdf2548ada44f398c3bbdc, type: 3}
-  - {fileID: 1872410055, guid: 830e974d4cfdf2548ada44f398c3bbdc, type: 3}
-  - {fileID: 1872410055, guid: 830e974d4cfdf2548ada44f398c3bbdc, type: 3}
   - {fileID: 1872410055, guid: 511012ded7ac43547984bf82a726f47e, type: 3}
   isComputer: 0
