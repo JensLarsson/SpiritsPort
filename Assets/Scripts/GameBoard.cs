@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class GameBoard : MonoBehaviour
@@ -13,6 +14,11 @@ public class GameBoard : MonoBehaviour
     [SerializeField] int enviromentalObjects = 3;
     [SerializeField] List<EnviromentalObject> envirornment = new List<EnviromentalObject>();
     [SerializeField] GameObject DustEffect;
+
+    [SerializeField] Slider miniMaxDepthSlider;
+    [SerializeField] Toggle miniMaxToggle;
+    public bool useMiniMax => miniMaxToggle;
+    public int miniMaxDepth => Mathf.RoundToInt(miniMaxDepthSlider.value);
 
     public BoardTile[,] Board { get; private set; }
 #pragma warning disable CS0108 // Member hides inherited member; missing new keyword

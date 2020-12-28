@@ -28,6 +28,8 @@ public class Player : ScriptableObject
     public string PlayerName => playerName;
     public ReadOnlyCollection<BoardUnit> Creatures => creatures.AsReadOnly();
     public Color PlayerColour => playerColour;
-    public BoardState ControllState => isComputer ? new BoardState_ComputerControlled(this) : new BoardState_UnSelected(this) as BoardState;
+    public BoardState ControllState => isComputer ?
+        new BoardState_ComputerControlled(this, GameBoard.Instance.useMiniMax, GameBoard.Instance.miniMaxDepth)
+        : new BoardState_UnSelected(this) as BoardState;
 }
 

@@ -9,15 +9,22 @@ using UnityEngine;
 
 class BoardState_ComputerControlled : BoardState
 {
-    Player currentPlayer;
-    Queue<BoardUnitBaseClass> computerUnits;
-    Queue<BoardUnitBaseClass> enemyUnits;
 
     const int MAX = 99999;
     const int MIN = -99999;
-    public BoardState_ComputerControlled(Player player)
+
+
+    Player currentPlayer;
+    Queue<BoardUnitBaseClass> computerUnits;
+    Queue<BoardUnitBaseClass> enemyUnits;
+    int treeDepth;
+    bool miniMaxiUse;
+
+    public BoardState_ComputerControlled(Player player, bool useMiniMaxi = true, int maxTreeDepth = 3)
     {
         currentPlayer = player;
+        treeDepth = maxTreeDepth;
+        miniMaxiUse = useMiniMaxi;
     }
 
     public override void EnterState(GameBoard gameBoard, (int x, int y)[] positions = null)
@@ -25,30 +32,17 @@ class BoardState_ComputerControlled : BoardState
         computerUnits = new Queue<BoardUnitBaseClass>(gameBoard.GetAllUnitsOfFaction(currentPlayer));
         enemyUnits = new Queue<BoardUnitBaseClass>(gameBoard.GetAllUnitsOfFaction(gameBoard.NotCurrentPlayer));
 
-        //var test = new BoardTurnInfo(gameBoard.Board, gameBoard.CurrentPlayer);
-        //test.Print();
-        //test.Move(new Vector2Int(4, 4), new Vector2Int(3, 3));
-        //Debug.LogError("<---------------------------------------------------->");
-        //test = test.Clone();
-        //test.Print();
-        //var tiles = test.GetAccessableTiles(new Vector2Int(4, 4), 3);
-        //foreach (Vector2Int pos in tiles)
-        //{
-        //    Debug.Log(pos);
-        //}
+        if (miniMaxiUse)
+        {
+            int treeNodeCount = 0;
+            BoardTurnInfo BestMove = AplhaBeta(gameBoard, new BoardTurnInfo(gameBoard.Board, currentPlayer), ref treeNodeCount, treeDepth);
+            EngageRound(gameBoard, BestMove, computerUnits.Count);
+        }
+        else
+        {
+            RandomUnitRound(gameBoard);
+        }
 
-
-        int i = 0;
-        //BoardTurnInfo BestMove = MaxTurn(gameBoard, new BoardTurnInfo(gameBoard.Board, gameBoard.CurrentPlayer), new Queue<BoardUnitBaseClass>(playerUnits), ref i);
-        //BoardTurnInfo BestMove = MiniMax(gameBoard, new BoardTurnInfo(gameBoard.Board, currentPlayer), ref i);
-        BoardTurnInfo BestMove = AplhaBeta(gameBoard, new BoardTurnInfo(gameBoard.Board, currentPlayer), ref i);
-        Debug.Log(i);
-        Debug.Log(BestMove.turnValue);
-        Debug.Log(BestMove.moves.Count);
-        Debug.Log(BestMove.abilities.Count);
-        MinMaxRoundEngage(gameBoard, BestMove, computerUnits.Count);
-
-        //RandomUnitRound(gameBoard);
     }
 
     void RandomUnitRound(GameBoard gameBoard)
@@ -123,6 +117,7 @@ class BoardState_ComputerControlled : BoardState
         return bestState;
     }
 
+    //There is no reason to still have this now when AlphaBeta pruning is implemented
     BoardTurnInfo MiniMax(GameBoard gameBoard, BoardTurnInfo state, ref int count, int depth = 3, Queue<TileTurnInfo> unitList = null, bool maximizing = true, bool unchanged = true)
     {
         count++;
@@ -250,158 +245,8 @@ class BoardState_ComputerControlled : BoardState
         }
         return bestState;
     }
-    //BoardTurnInfo AplhaBeta(GameBoard gameBoard, BoardTurnInfo state, ref int count, int depth = 3, int alpha = MIN, int beta = MAX, bool maximizing = true, Queue<TileTurnInfo> unitList = null)
-    //{
-    //    count++;
-    //    if (depth == 0)
-    //    {
-    //        return state;
-    //    }
-    //    if (unitList == null || unitList.Count == 0)
-    //    {
-    //        unitList = maximizing ? state.GetUnitTiles(TargetType.Friend) : state.GetUnitTiles(TargetType.Foe);
-    //    }
-    //    BoardTurnInfo bestState = state;
-    //    if (unitList.Count > 0)
-    //    {
-    //        TileTurnInfo unit = unitList.Dequeue();
-    //        int nextDepth = unitList.Count > 0 ? depth : depth - 1;
-    //        bool nextMax = unitList.Count > 0 ? maximizing : !maximizing;
-    //        if (maximizing)
-    //        {
-    //            bestState.TempValue = MIN;
-    //            foreach (Vector2Int pos in state.GetAccessableTiles(unit.boardPosition, unit.speed))
-    //            {
-    //                Ability ability = unit.abilities[0];
-    //                foreach (BoardTile targetTile in ability.GetLinearTiles(gameBoard, pos, ability.movesThroughUnits))
-    //                {
-    //                    BoardTurnInfo stateClone = state.Clone();
-    //                    stateClone.Move(unit.boardPosition, pos);
-    //                    stateClone.DamageTile(targetTile.BoardPosition, ability);
-    //                    stateClone = AplhaBeta(gameBoard, stateClone, ref count, nextDepth, alpha, beta, nextMax, new Queue<TileTurnInfo>(unitList));
-    //                    if (stateClone.turnValue > bestState.TempValue)
-    //                    {
-    //                        bestState = stateClone;
-    //                        bestState.TempValue = stateClone.turnValue;
-    //                    }
-    //                    alpha = Mathf.Max(alpha, bestState.TempValue);
-    //                    if (beta <= alpha)
-    //                    {
-    //                        return bestState;
-    //                    }
-    //                }
-    //            }
-    //        }
-    //        else
-    //        {
-    //            bestState.TempValue = MAX;
-    //            foreach (Vector2Int pos in state.GetAccessableTiles(unit.boardPosition, unit.speed))
-    //            {
-    //                Ability ability = unit.abilities[0];
-    //                foreach (BoardTile targetTile in ability.GetLinearTiles(gameBoard, pos, ability.movesThroughUnits))
-    //                {
-    //                    BoardTurnInfo stateClone = state.Clone();
-    //                    stateClone.Move(unit.boardPosition, pos);
-    //                    stateClone.DamageTile(targetTile.BoardPosition, ability);
-    //                    stateClone = AplhaBeta(gameBoard, stateClone, ref count, nextDepth, alpha, beta, nextMax, new Queue<TileTurnInfo>(unitList));
-    //                    if (stateClone.turnValue < bestState.TempValue)
-    //                    {
-    //                        bestState = stateClone;
-    //                        bestState.TempValue = stateClone.turnValue;
-    //                    }
-    //                    beta = Mathf.Min(beta, bestState.TempValue);
-    //                    if (beta <= alpha)
-    //                    {
-    //                        return bestState;
-    //                    }
-    //                }
-    //            }
-    //        }
-    //    }
-    //    return bestState;
-    //}
 
-    //BoardTurnInfo AlphaBeta(GameBoard gameBoard, BoardTurnInfo state, ref int count, int depth = 3, int alpha = MIN, int beta = MAX, Queue<TileTurnInfo> unitList = null, bool maximizing = true, bool unchanged = true)
-    //{
 
-    //    int a = alpha;
-    //    int b = beta;
-    //    count++;
-    //    if (depth == 0)
-    //    {
-    //        return state;
-    //    }
-
-    //    BoardTurnInfo bestState = state;
-    //    if (unitList == null || unitList.Count == 0)
-    //    {
-    //        unitList = maximizing ? state.GetUnitTiles(TargetType.Friend) : state.GetUnitTiles(TargetType.Foe);
-    //    }
-
-    //    if (unitList.Count > 0)
-    //    {
-    //        TileTurnInfo unit = unitList.Dequeue();
-    //        //Round itteration
-    //        depth = unitList.Count > 0 ? depth : --depth;
-    //        bool nextMaximizing = unitList.Count > 0 ? maximizing : !maximizing;
-    //        //int value = maximizing ? MIN : MAX;
-    //        //Get Movement
-    //        Stack<Vector2Int> accessableTiles = state.GetAccessableTiles(unit.boardPosition, unit.speed);
-    //        while (accessableTiles.Count > 0)
-    //        {
-
-    //            Vector2Int pos = accessableTiles.Pop();
-    //            Ability ability = unit.abilities[0];
-    //            List<BoardTile> targetableTiles = ability.GetLinearTiles(gameBoard, pos, ability.movesThroughUnits);
-    //            bool noTargetStateFound = false;
-    //            foreach (BoardTile tile in targetableTiles)
-    //            {
-    //                BoardTurnInfo stateClone = state.Clone();
-    //                stateClone.Move(unit.boardPosition, pos);
-    //                bool hit = stateClone.DamageTile(tile.BoardPosition, ability);
-
-    //                if (hit || noTargetStateFound == false)
-    //                {
-    //                    stateClone = AlphaBeta(gameBoard, stateClone, ref count, depth, a, b, new Queue<TileTurnInfo>(unitList), nextMaximizing);
-    //                    unchanged = false;
-    //                    //Debug.Log(depth + 1 + (maximizing ? " max: " : " min: ") + "Beta:" + b + " Alpha:" + a);
-    //                    if (maximizing)
-    //                    {
-    //                        if (stateClone.turnValue >= bestState.turnValue)
-    //                        {
-    //                            bestState = stateClone;
-    //                            //value = stateClone.turnValue;
-    //                        }
-    //                        a = System.Math.Max(a, stateClone.turnValue);
-    //                        if (b < a)
-    //                        {
-    //                            //Debug.Log(b + "<=" + a);
-    //                            return bestState;
-    //                        }
-    //                    }
-    //                    else
-    //                    {
-    //                        if (stateClone.turnValue >= bestState.turnValue)
-    //                        {
-    //                            bestState = stateClone;
-    //                            //value = stateClone.turnValue;
-    //                        }
-    //                        b = System.Math.Min(b, stateClone.turnValue);
-    //                        if (b < a)
-    //                        {
-    //                            //Debug.Log(b + "<=" + a);
-    //                            return bestState;
-    //                        }
-    //                    }
-    //                }
-    //                noTargetStateFound = noTargetStateFound ? true : !hit;
-    //            }
-
-    //        }
-
-    //    }
-    //    return bestState;
-    //}
     List<BoardTile> GetAccessableTiles(GameBoard gameBoard, BoardUnit unit)
     {
         bool[,] tileAccesArray = PathFinding.DijkstraPath(gameBoard.GetAccessibleTiles(),
@@ -419,21 +264,20 @@ class BoardState_ComputerControlled : BoardState
         }
         return accessableTiles;
     }
-    void MinMaxRoundEngage(GameBoard gameBoard, BoardTurnInfo turnInfo, int units)
+
+
+    void EngageRound(GameBoard gameBoard, BoardTurnInfo turnInfo, int units)
     {
         if (units > 0)
         {
             var move = turnInfo.moves.Dequeue();
             var abilityInfo = turnInfo.abilities.Dequeue();
-            //Debug.Log(move.from);
-            //Debug.Log(move.to);
-            //Debug.Log(turnInfo.abilities.Peek());
             BoardTile tile = gameBoard.GetBoardTile(move.from);
             gameBoard.MoveUnit(tile.GetUnit, move.to);
             abilityInfo.ability.Invoke(gameBoard.GetBoardTile(move.to), gameBoard.GetBoardTile(abilityInfo.pos),
                 () =>
                 {
-                    MinMaxRoundEngage(gameBoard, turnInfo, units - 1);
+                    EngageRound(gameBoard, turnInfo, units - 1);
                 });
         }
         else
@@ -441,9 +285,6 @@ class BoardState_ComputerControlled : BoardState
             gameBoard.EndTurn();
         }
     }
-
-
-
 
 
     public override void Interact(GameBoard gameBoard, Vector2Int position)
