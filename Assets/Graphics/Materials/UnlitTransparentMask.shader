@@ -1,5 +1,4 @@
-﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
-
+﻿
 Shader "Unlit/UnlitTransparentMask"
 {
 	Properties{
@@ -15,25 +14,20 @@ Shader "Unlit/UnlitTransparentMask"
 	 Blend SrcAlpha OneMinusSrcAlpha
 
 		Pass {
-
 					CGPROGRAM
 					#pragma vertex vert
 					#pragma fragment frag
-
-
-
-
 
 					float random(float n)
 				{
 					return frac(cos(n * 89.42) * 343.42);
 				}
-
 				float2 random(float2 n)
 
 				{
 					return float2(random(n.x * 23.62 - 300.0 + n.y * 34.35),random(n.x * 45.13 + 256.0 + n.y * 38.89));
 				}
+				//Worley Noise
 				float worley(float2 pos,float scale)
 				{
 					float dis = 2.0;
@@ -48,13 +42,7 @@ Shader "Unlit/UnlitTransparentMask"
 					}
 					return 1.0 - dis;
 				}
-
-				//float random(float2 st) {
-				//	return frac(sin(dot(st.xy,
-				//		float2(12.9898, 78.233)))
-				//		* 43758.5453123);
-				//}
-
+				//1D Turbulence
 				float noise(float2 xy) {
 					float2 i = floor(xy);
 					float2 f = frac(xy);
@@ -70,7 +58,7 @@ Shader "Unlit/UnlitTransparentMask"
 						(c - a) * u.y * (1.0 - u.x) +
 						(d - b) * u.x * u.y;
 				}
-
+				//2D Turbulence
 				float noise(float x, float y) {
 					float2 i = floor(float2(x, y));
 					float2 f = frac(float2(x, y));
@@ -87,6 +75,7 @@ Shader "Unlit/UnlitTransparentMask"
 						(d - b) * u.x * u.y;
 				}
 
+				//fBm Noise
 	#define NUM_OCTAVES 5
 				float fBm(in float2 _st) {
 					float v = 0.0;
@@ -128,7 +117,6 @@ Shader "Unlit/UnlitTransparentMask"
 
 						fixed4 frag(v2f i) : SV_Target{
 							float4 mask = tex2D(_MaskTexture, i.uv);
-							//float4 col = _Color * tex2D(_Texture, i.uv) * mask;
 							float wor = max(0.4, 1 - worley((i.worldSpacePos) * 300, 100));
 							float fbm = max(0.4, fBm(i.worldSpacePos * 10 + _SinTime.y));
 							float4 col = (wor + fbm) * 0.8 * _Color;

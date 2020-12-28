@@ -2262,6 +2262,7 @@ MonoBehaviour:
   maxMovement: 3
   abilities:
   - {fileID: 11400000, guid: cf2d7e13b37eec64ca61a11d032401a1, type: 2}
+  - {fileID: 11400000, guid: e2becda0b2668ca449d2eb725d8f28fb, type: 2}
   icon: {fileID: 21300000, guid: 5c9895cf39422834286b1c3397406646, type: 3}
   pushable: 1
   healthBar: {fileID: 7817500283543449989}

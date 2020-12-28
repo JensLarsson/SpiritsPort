@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c33bf9438dd22ec4c9e98c28557ab9d4, type: 3}
   m_Name: Acid
   m_EditorClassIdentifier: 
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 749bd116ecccb7b4bb4f403374f4a653, type: 3}
   targeting: 0
   movesThroughOccupied: 1
   pushesTarget: 0

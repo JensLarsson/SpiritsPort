@@ -292,5 +292,10 @@ class BoardState_ComputerControlled : BoardState
 
     }
 
+    public override void Update(GameBoard gameBoard, Vector2Int boardPosition)
+    {
+
+    }
+
 }
 
