@@ -26,7 +26,7 @@ public class Ability : ScriptableObject
         switch (targeting)
         {
             case TARGETING_TYPE.Linear:
-                LinearTargeting(board, tile.BoardPosition, movesThroughOccupied);
+                SetLinearlyTargetableTiles(board, tile.BoardPosition, movesThroughOccupied);
                 break;
         }
     }
@@ -87,6 +87,7 @@ public class Ability : ScriptableObject
         }
     }
 
+    //Returns a list of targetable tiles based on the range variables
     public List<BoardTile> GetLinearTiles(GameBoard board, Vector2Int startPos, bool movesThrough = false)
     {
         List<BoardTile> tiles = new List<BoardTile>();
@@ -133,7 +134,7 @@ public class Ability : ScriptableObject
         return tiles;
     }
 
-    public void LinearTargeting(GameBoard board, Vector2Int startPos, bool movesThrough = false)
+    public void SetLinearlyTargetableTiles(GameBoard board, Vector2Int startPos, bool movesThrough = false)
     {
         List<BoardTile> tiles = GetLinearTiles(board, startPos, movesThrough);
         foreach (BoardTile tile in tiles)
